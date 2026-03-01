@@ -22,6 +22,14 @@ dependencies:
 
   # Networking
   dio: ^5.4.0
+  socket_io_client: ^2.0.3+1
+
+  # Firebase
+  firebase_core: ^2.24.2
+  firebase_auth: ^4.17.8
+  cloud_firestore: ^4.15.8
+  firebase_messaging: ^14.9.4
+  firebase_analytics: ^10.8.0
 
   # Functional Programming
   dartz: ^0.10.1
@@ -32,13 +40,15 @@ dependencies:
 
   # Secure Storage
   flutter_secure_storage: ^9.0.0
+  shared_preferences: ^2.2.3
 
   # UI/UX
   flutter_screenutil: ^5.9.0
   google_fonts: ^6.1.0
   image_picker: ^1.0.7
   shimmer: ^3.0.0
-  fluttertoast: ^8.2.4
+  # fluttertoast: ^8.2.8  # Removed due to v1 embedding compatibility issues
+  flutter_local_notifications: ^17.2.3
   fl_chart: ^0.66.2
   cached_network_image: ^3.3.1
   lottie: ^3.1.0
@@ -46,6 +56,9 @@ dependencies:
   # Location
   geolocator: ^11.0.0
   geocoding: ^2.1.1
+  
+  # Google Maps
+  google_maps_flutter: ^2.14.2
 
   # Local Auth (Biometric)
   local_auth: ^2.2.0

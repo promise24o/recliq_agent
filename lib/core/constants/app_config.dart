@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 
 class AppConfig {
   static const String appName = 'Recliq Agent';
-  static const String baseUrl = 'http://10.0.2.2:5001';
+  static const String baseUrl = 'https://0bfd-105-127-15-165.ngrok-free.app';
+  // static const String baseUrl = 'http://10.0.2.2:5001';
+
 
   // API Endpoints - Auth
   static const String registerEndpoint = '/auth/register';
@@ -21,6 +23,21 @@ class AppConfig {
   static const String updateProfileEndpoint = '/auth/update-profile';
   static const String uploadPhotoEndpoint = '/auth/upload-photo';
   static const String biometricEndpoint = '/auth/biometric';
+
+  // API Endpoints - Agent Availability & Location
+  static const String agentAvailabilityEndpoint = '/agent-availability';
+  static const String onlineStatusEndpoint = '/agent-availability/online-status';
+  static const String locationUpdateEndpoint = '/agent-availability/location';
+  static const String wsLocationNamespace = '/agent-location';
+
+  // Location Tracking
+  static const int locationUpdateIntervalActive = 5; // seconds - on pickup
+  static const int locationUpdateIntervalAvailable = 10; // seconds - nearby requests
+  static const int locationUpdateIntervalIdle = 30; // seconds - no activity
+  static const int locationUpdateIntervalLowBattery = 120; // seconds - battery < 20%
+  static const int locationUpdateIntervalBackground = 300; // seconds - background only
+  static const double locationAccuracyThreshold = 200.0; // meters - reject if worse
+  static const double locationStationaryThreshold = 50.0; // meters - pause if not moved
 
   // Storage Keys
   static const String authTokenKey = 'auth_token';

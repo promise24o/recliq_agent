@@ -21,7 +21,7 @@ AuthResponse _$AuthResponseFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$AuthResponse {
-  String get message => throw _privateConstructorUsedError;
+  String? get message => throw _privateConstructorUsedError;
   User? get user => throw _privateConstructorUsedError;
   String? get accessToken => throw _privateConstructorUsedError;
   String? get refreshToken => throw _privateConstructorUsedError;
@@ -45,7 +45,7 @@ abstract class $AuthResponseCopyWith<$Res> {
   ) = _$AuthResponseCopyWithImpl<$Res, AuthResponse>;
   @useResult
   $Res call({
-    String message,
+    String? message,
     User? user,
     String? accessToken,
     String? refreshToken,
@@ -70,7 +70,7 @@ class _$AuthResponseCopyWithImpl<$Res, $Val extends AuthResponse>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? message = null,
+    Object? message = freezed,
     Object? user = freezed,
     Object? accessToken = freezed,
     Object? refreshToken = freezed,
@@ -78,10 +78,10 @@ class _$AuthResponseCopyWithImpl<$Res, $Val extends AuthResponse>
   }) {
     return _then(
       _value.copyWith(
-            message: null == message
+            message: freezed == message
                 ? _value.message
                 : message // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as String?,
             user: freezed == user
                 ? _value.user
                 : user // ignore: cast_nullable_to_non_nullable
@@ -128,7 +128,7 @@ abstract class _$$AuthResponseImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    String message,
+    String? message,
     User? user,
     String? accessToken,
     String? refreshToken,
@@ -153,7 +153,7 @@ class __$$AuthResponseImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? message = null,
+    Object? message = freezed,
     Object? user = freezed,
     Object? accessToken = freezed,
     Object? refreshToken = freezed,
@@ -161,10 +161,10 @@ class __$$AuthResponseImplCopyWithImpl<$Res>
   }) {
     return _then(
       _$AuthResponseImpl(
-        message: null == message
+        message: freezed == message
             ? _value.message
             : message // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as String?,
         user: freezed == user
             ? _value.user
             : user // ignore: cast_nullable_to_non_nullable
@@ -190,7 +190,7 @@ class __$$AuthResponseImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$AuthResponseImpl implements _AuthResponse {
   const _$AuthResponseImpl({
-    required this.message,
+    this.message,
     this.user,
     this.accessToken,
     this.refreshToken,
@@ -201,7 +201,7 @@ class _$AuthResponseImpl implements _AuthResponse {
       _$$AuthResponseImplFromJson(json);
 
   @override
-  final String message;
+  final String? message;
   @override
   final User? user;
   @override
@@ -259,7 +259,7 @@ class _$AuthResponseImpl implements _AuthResponse {
 
 abstract class _AuthResponse implements AuthResponse {
   const factory _AuthResponse({
-    required final String message,
+    final String? message,
     final User? user,
     final String? accessToken,
     final String? refreshToken,
@@ -270,7 +270,7 @@ abstract class _AuthResponse implements AuthResponse {
       _$AuthResponseImpl.fromJson;
 
   @override
-  String get message;
+  String? get message;
   @override
   User? get user;
   @override
@@ -294,7 +294,7 @@ OtpResponse _$OtpResponseFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$OtpResponse {
-  String get message => throw _privateConstructorUsedError;
+  String? get message => throw _privateConstructorUsedError;
   bool get requiresOtp => throw _privateConstructorUsedError;
 
   /// Serializes this OtpResponse to a JSON map.
@@ -314,7 +314,7 @@ abstract class $OtpResponseCopyWith<$Res> {
     $Res Function(OtpResponse) then,
   ) = _$OtpResponseCopyWithImpl<$Res, OtpResponse>;
   @useResult
-  $Res call({String message, bool requiresOtp});
+  $Res call({String? message, bool requiresOtp});
 }
 
 /// @nodoc
@@ -331,13 +331,13 @@ class _$OtpResponseCopyWithImpl<$Res, $Val extends OtpResponse>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? message = null, Object? requiresOtp = null}) {
+  $Res call({Object? message = freezed, Object? requiresOtp = null}) {
     return _then(
       _value.copyWith(
-            message: null == message
+            message: freezed == message
                 ? _value.message
                 : message // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as String?,
             requiresOtp: null == requiresOtp
                 ? _value.requiresOtp
                 : requiresOtp // ignore: cast_nullable_to_non_nullable
@@ -357,7 +357,7 @@ abstract class _$$OtpResponseImplCopyWith<$Res>
   ) = __$$OtpResponseImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String message, bool requiresOtp});
+  $Res call({String? message, bool requiresOtp});
 }
 
 /// @nodoc
@@ -373,13 +373,13 @@ class __$$OtpResponseImplCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? message = null, Object? requiresOtp = null}) {
+  $Res call({Object? message = freezed, Object? requiresOtp = null}) {
     return _then(
       _$OtpResponseImpl(
-        message: null == message
+        message: freezed == message
             ? _value.message
             : message // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as String?,
         requiresOtp: null == requiresOtp
             ? _value.requiresOtp
             : requiresOtp // ignore: cast_nullable_to_non_nullable
@@ -392,13 +392,13 @@ class __$$OtpResponseImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$OtpResponseImpl implements _OtpResponse {
-  const _$OtpResponseImpl({required this.message, this.requiresOtp = true});
+  const _$OtpResponseImpl({this.message, this.requiresOtp = true});
 
   factory _$OtpResponseImpl.fromJson(Map<String, dynamic> json) =>
       _$$OtpResponseImplFromJson(json);
 
   @override
-  final String message;
+  final String? message;
   @override
   @JsonKey()
   final bool requiresOtp;
@@ -437,16 +437,14 @@ class _$OtpResponseImpl implements _OtpResponse {
 }
 
 abstract class _OtpResponse implements OtpResponse {
-  const factory _OtpResponse({
-    required final String message,
-    final bool requiresOtp,
-  }) = _$OtpResponseImpl;
+  const factory _OtpResponse({final String? message, final bool requiresOtp}) =
+      _$OtpResponseImpl;
 
   factory _OtpResponse.fromJson(Map<String, dynamic> json) =
       _$OtpResponseImpl.fromJson;
 
   @override
-  String get message;
+  String? get message;
   @override
   bool get requiresOtp;
 
@@ -466,7 +464,7 @@ ForgotPasswordResponse _$ForgotPasswordResponseFromJson(
 
 /// @nodoc
 mixin _$ForgotPasswordResponse {
-  String get message => throw _privateConstructorUsedError;
+  String? get message => throw _privateConstructorUsedError;
   String? get email => throw _privateConstructorUsedError;
   @JsonKey(name: 'expires_in')
   int? get expiresIn => throw _privateConstructorUsedError;
@@ -489,7 +487,7 @@ abstract class $ForgotPasswordResponseCopyWith<$Res> {
   ) = _$ForgotPasswordResponseCopyWithImpl<$Res, ForgotPasswordResponse>;
   @useResult
   $Res call({
-    String message,
+    String? message,
     String? email,
     @JsonKey(name: 'expires_in') int? expiresIn,
   });
@@ -513,16 +511,16 @@ class _$ForgotPasswordResponseCopyWithImpl<
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? message = null,
+    Object? message = freezed,
     Object? email = freezed,
     Object? expiresIn = freezed,
   }) {
     return _then(
       _value.copyWith(
-            message: null == message
+            message: freezed == message
                 ? _value.message
                 : message // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as String?,
             email: freezed == email
                 ? _value.email
                 : email // ignore: cast_nullable_to_non_nullable
@@ -547,7 +545,7 @@ abstract class _$$ForgotPasswordResponseImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    String message,
+    String? message,
     String? email,
     @JsonKey(name: 'expires_in') int? expiresIn,
   });
@@ -568,16 +566,16 @@ class __$$ForgotPasswordResponseImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? message = null,
+    Object? message = freezed,
     Object? email = freezed,
     Object? expiresIn = freezed,
   }) {
     return _then(
       _$ForgotPasswordResponseImpl(
-        message: null == message
+        message: freezed == message
             ? _value.message
             : message // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as String?,
         email: freezed == email
             ? _value.email
             : email // ignore: cast_nullable_to_non_nullable
@@ -595,7 +593,7 @@ class __$$ForgotPasswordResponseImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$ForgotPasswordResponseImpl implements _ForgotPasswordResponse {
   const _$ForgotPasswordResponseImpl({
-    required this.message,
+    this.message,
     this.email,
     @JsonKey(name: 'expires_in') this.expiresIn,
   });
@@ -604,7 +602,7 @@ class _$ForgotPasswordResponseImpl implements _ForgotPasswordResponse {
       _$$ForgotPasswordResponseImplFromJson(json);
 
   @override
-  final String message;
+  final String? message;
   @override
   final String? email;
   @override
@@ -651,7 +649,7 @@ class _$ForgotPasswordResponseImpl implements _ForgotPasswordResponse {
 
 abstract class _ForgotPasswordResponse implements ForgotPasswordResponse {
   const factory _ForgotPasswordResponse({
-    required final String message,
+    final String? message,
     final String? email,
     @JsonKey(name: 'expires_in') final int? expiresIn,
   }) = _$ForgotPasswordResponseImpl;
@@ -660,7 +658,7 @@ abstract class _ForgotPasswordResponse implements ForgotPasswordResponse {
       _$ForgotPasswordResponseImpl.fromJson;
 
   @override
-  String get message;
+  String? get message;
   @override
   String? get email;
   @override
@@ -681,8 +679,8 @@ TokenResponse _$TokenResponseFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$TokenResponse {
-  String get accessToken => throw _privateConstructorUsedError;
-  String get refreshToken => throw _privateConstructorUsedError;
+  String? get accessToken => throw _privateConstructorUsedError;
+  String? get refreshToken => throw _privateConstructorUsedError;
 
   /// Serializes this TokenResponse to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -701,7 +699,7 @@ abstract class $TokenResponseCopyWith<$Res> {
     $Res Function(TokenResponse) then,
   ) = _$TokenResponseCopyWithImpl<$Res, TokenResponse>;
   @useResult
-  $Res call({String accessToken, String refreshToken});
+  $Res call({String? accessToken, String? refreshToken});
 }
 
 /// @nodoc
@@ -718,17 +716,17 @@ class _$TokenResponseCopyWithImpl<$Res, $Val extends TokenResponse>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? accessToken = null, Object? refreshToken = null}) {
+  $Res call({Object? accessToken = freezed, Object? refreshToken = freezed}) {
     return _then(
       _value.copyWith(
-            accessToken: null == accessToken
+            accessToken: freezed == accessToken
                 ? _value.accessToken
                 : accessToken // ignore: cast_nullable_to_non_nullable
-                      as String,
-            refreshToken: null == refreshToken
+                      as String?,
+            refreshToken: freezed == refreshToken
                 ? _value.refreshToken
                 : refreshToken // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as String?,
           )
           as $Val,
     );
@@ -744,7 +742,7 @@ abstract class _$$TokenResponseImplCopyWith<$Res>
   ) = __$$TokenResponseImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String accessToken, String refreshToken});
+  $Res call({String? accessToken, String? refreshToken});
 }
 
 /// @nodoc
@@ -760,17 +758,17 @@ class __$$TokenResponseImplCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? accessToken = null, Object? refreshToken = null}) {
+  $Res call({Object? accessToken = freezed, Object? refreshToken = freezed}) {
     return _then(
       _$TokenResponseImpl(
-        accessToken: null == accessToken
+        accessToken: freezed == accessToken
             ? _value.accessToken
             : accessToken // ignore: cast_nullable_to_non_nullable
-                  as String,
-        refreshToken: null == refreshToken
+                  as String?,
+        refreshToken: freezed == refreshToken
             ? _value.refreshToken
             : refreshToken // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as String?,
       ),
     );
   }
@@ -779,18 +777,15 @@ class __$$TokenResponseImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$TokenResponseImpl implements _TokenResponse {
-  const _$TokenResponseImpl({
-    required this.accessToken,
-    required this.refreshToken,
-  });
+  const _$TokenResponseImpl({this.accessToken, this.refreshToken});
 
   factory _$TokenResponseImpl.fromJson(Map<String, dynamic> json) =>
       _$$TokenResponseImplFromJson(json);
 
   @override
-  final String accessToken;
+  final String? accessToken;
   @override
-  final String refreshToken;
+  final String? refreshToken;
 
   @override
   String toString() {
@@ -828,17 +823,17 @@ class _$TokenResponseImpl implements _TokenResponse {
 
 abstract class _TokenResponse implements TokenResponse {
   const factory _TokenResponse({
-    required final String accessToken,
-    required final String refreshToken,
+    final String? accessToken,
+    final String? refreshToken,
   }) = _$TokenResponseImpl;
 
   factory _TokenResponse.fromJson(Map<String, dynamic> json) =
       _$TokenResponseImpl.fromJson;
 
   @override
-  String get accessToken;
+  String? get accessToken;
   @override
-  String get refreshToken;
+  String? get refreshToken;
 
   /// Create a copy of TokenResponse
   /// with the given fields replaced by the non-null parameter values.
@@ -854,8 +849,8 @@ PhotoUploadResponse _$PhotoUploadResponseFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$PhotoUploadResponse {
-  String get message => throw _privateConstructorUsedError;
-  String get profilePhoto => throw _privateConstructorUsedError;
+  String? get message => throw _privateConstructorUsedError;
+  String? get profilePhoto => throw _privateConstructorUsedError;
 
   /// Serializes this PhotoUploadResponse to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -874,7 +869,7 @@ abstract class $PhotoUploadResponseCopyWith<$Res> {
     $Res Function(PhotoUploadResponse) then,
   ) = _$PhotoUploadResponseCopyWithImpl<$Res, PhotoUploadResponse>;
   @useResult
-  $Res call({String message, String profilePhoto});
+  $Res call({String? message, String? profilePhoto});
 }
 
 /// @nodoc
@@ -891,17 +886,17 @@ class _$PhotoUploadResponseCopyWithImpl<$Res, $Val extends PhotoUploadResponse>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? message = null, Object? profilePhoto = null}) {
+  $Res call({Object? message = freezed, Object? profilePhoto = freezed}) {
     return _then(
       _value.copyWith(
-            message: null == message
+            message: freezed == message
                 ? _value.message
                 : message // ignore: cast_nullable_to_non_nullable
-                      as String,
-            profilePhoto: null == profilePhoto
+                      as String?,
+            profilePhoto: freezed == profilePhoto
                 ? _value.profilePhoto
                 : profilePhoto // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as String?,
           )
           as $Val,
     );
@@ -917,7 +912,7 @@ abstract class _$$PhotoUploadResponseImplCopyWith<$Res>
   ) = __$$PhotoUploadResponseImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String message, String profilePhoto});
+  $Res call({String? message, String? profilePhoto});
 }
 
 /// @nodoc
@@ -933,17 +928,17 @@ class __$$PhotoUploadResponseImplCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? message = null, Object? profilePhoto = null}) {
+  $Res call({Object? message = freezed, Object? profilePhoto = freezed}) {
     return _then(
       _$PhotoUploadResponseImpl(
-        message: null == message
+        message: freezed == message
             ? _value.message
             : message // ignore: cast_nullable_to_non_nullable
-                  as String,
-        profilePhoto: null == profilePhoto
+                  as String?,
+        profilePhoto: freezed == profilePhoto
             ? _value.profilePhoto
             : profilePhoto // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as String?,
       ),
     );
   }
@@ -952,18 +947,15 @@ class __$$PhotoUploadResponseImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$PhotoUploadResponseImpl implements _PhotoUploadResponse {
-  const _$PhotoUploadResponseImpl({
-    required this.message,
-    required this.profilePhoto,
-  });
+  const _$PhotoUploadResponseImpl({this.message, this.profilePhoto});
 
   factory _$PhotoUploadResponseImpl.fromJson(Map<String, dynamic> json) =>
       _$$PhotoUploadResponseImplFromJson(json);
 
   @override
-  final String message;
+  final String? message;
   @override
-  final String profilePhoto;
+  final String? profilePhoto;
 
   @override
   String toString() {
@@ -1003,17 +995,17 @@ class _$PhotoUploadResponseImpl implements _PhotoUploadResponse {
 
 abstract class _PhotoUploadResponse implements PhotoUploadResponse {
   const factory _PhotoUploadResponse({
-    required final String message,
-    required final String profilePhoto,
+    final String? message,
+    final String? profilePhoto,
   }) = _$PhotoUploadResponseImpl;
 
   factory _PhotoUploadResponse.fromJson(Map<String, dynamic> json) =
       _$PhotoUploadResponseImpl.fromJson;
 
   @override
-  String get message;
+  String? get message;
   @override
-  String get profilePhoto;
+  String? get profilePhoto;
 
   /// Create a copy of PhotoUploadResponse
   /// with the given fields replaced by the non-null parameter values.

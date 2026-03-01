@@ -21,11 +21,11 @@ User _$UserFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$User {
-  String get id => throw _privateConstructorUsedError;
-  String get email => throw _privateConstructorUsedError;
-  String get name => throw _privateConstructorUsedError;
+  String? get id => throw _privateConstructorUsedError;
+  String? get email => throw _privateConstructorUsedError;
+  String? get name => throw _privateConstructorUsedError;
   String? get phone => throw _privateConstructorUsedError;
-  String get role => throw _privateConstructorUsedError;
+  String? get role => throw _privateConstructorUsedError;
   String? get adminSubRole => throw _privateConstructorUsedError;
   bool get isVerified => throw _privateConstructorUsedError;
   bool get biometricEnabled => throw _privateConstructorUsedError;
@@ -33,10 +33,9 @@ mixin _$User {
   String? get referralCode => throw _privateConstructorUsedError;
   UserLocation? get location => throw _privateConstructorUsedError;
   UserNotifications? get notifications => throw _privateConstructorUsedError;
-  bool get hasPin => throw _privateConstructorUsedError;
   String? get pin => throw _privateConstructorUsedError;
-  String get createdAt => throw _privateConstructorUsedError;
-  String get updatedAt => throw _privateConstructorUsedError;
+  String? get createdAt => throw _privateConstructorUsedError;
+  String? get updatedAt => throw _privateConstructorUsedError;
 
   /// Serializes this User to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -53,11 +52,11 @@ abstract class $UserCopyWith<$Res> {
       _$UserCopyWithImpl<$Res, User>;
   @useResult
   $Res call({
-    String id,
-    String email,
-    String name,
+    String? id,
+    String? email,
+    String? name,
     String? phone,
-    String role,
+    String? role,
     String? adminSubRole,
     bool isVerified,
     bool biometricEnabled,
@@ -65,10 +64,9 @@ abstract class $UserCopyWith<$Res> {
     String? referralCode,
     UserLocation? location,
     UserNotifications? notifications,
-    bool hasPin,
     String? pin,
-    String createdAt,
-    String updatedAt,
+    String? createdAt,
+    String? updatedAt,
   });
 
   $UserLocationCopyWith<$Res>? get location;
@@ -90,11 +88,11 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
-    Object? email = null,
-    Object? name = null,
+    Object? id = freezed,
+    Object? email = freezed,
+    Object? name = freezed,
     Object? phone = freezed,
-    Object? role = null,
+    Object? role = freezed,
     Object? adminSubRole = freezed,
     Object? isVerified = null,
     Object? biometricEnabled = null,
@@ -102,33 +100,32 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
     Object? referralCode = freezed,
     Object? location = freezed,
     Object? notifications = freezed,
-    Object? hasPin = null,
     Object? pin = freezed,
-    Object? createdAt = null,
-    Object? updatedAt = null,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
   }) {
     return _then(
       _value.copyWith(
-            id: null == id
+            id: freezed == id
                 ? _value.id
                 : id // ignore: cast_nullable_to_non_nullable
-                      as String,
-            email: null == email
+                      as String?,
+            email: freezed == email
                 ? _value.email
                 : email // ignore: cast_nullable_to_non_nullable
-                      as String,
-            name: null == name
+                      as String?,
+            name: freezed == name
                 ? _value.name
                 : name // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as String?,
             phone: freezed == phone
                 ? _value.phone
                 : phone // ignore: cast_nullable_to_non_nullable
                       as String?,
-            role: null == role
+            role: freezed == role
                 ? _value.role
                 : role // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as String?,
             adminSubRole: freezed == adminSubRole
                 ? _value.adminSubRole
                 : adminSubRole // ignore: cast_nullable_to_non_nullable
@@ -157,22 +154,18 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
                 ? _value.notifications
                 : notifications // ignore: cast_nullable_to_non_nullable
                       as UserNotifications?,
-            hasPin: null == hasPin
-                ? _value.hasPin
-                : hasPin // ignore: cast_nullable_to_non_nullable
-                      as bool,
             pin: freezed == pin
                 ? _value.pin
                 : pin // ignore: cast_nullable_to_non_nullable
                       as String?,
-            createdAt: null == createdAt
+            createdAt: freezed == createdAt
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
-                      as String,
-            updatedAt: null == updatedAt
+                      as String?,
+            updatedAt: freezed == updatedAt
                 ? _value.updatedAt
                 : updatedAt // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as String?,
           )
           as $Val,
     );
@@ -216,11 +209,11 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
   @override
   @useResult
   $Res call({
-    String id,
-    String email,
-    String name,
+    String? id,
+    String? email,
+    String? name,
     String? phone,
-    String role,
+    String? role,
     String? adminSubRole,
     bool isVerified,
     bool biometricEnabled,
@@ -228,10 +221,9 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
     String? referralCode,
     UserLocation? location,
     UserNotifications? notifications,
-    bool hasPin,
     String? pin,
-    String createdAt,
-    String updatedAt,
+    String? createdAt,
+    String? updatedAt,
   });
 
   @override
@@ -252,11 +244,11 @@ class __$$UserImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
-    Object? email = null,
-    Object? name = null,
+    Object? id = freezed,
+    Object? email = freezed,
+    Object? name = freezed,
     Object? phone = freezed,
-    Object? role = null,
+    Object? role = freezed,
     Object? adminSubRole = freezed,
     Object? isVerified = null,
     Object? biometricEnabled = null,
@@ -264,33 +256,32 @@ class __$$UserImplCopyWithImpl<$Res>
     Object? referralCode = freezed,
     Object? location = freezed,
     Object? notifications = freezed,
-    Object? hasPin = null,
     Object? pin = freezed,
-    Object? createdAt = null,
-    Object? updatedAt = null,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
   }) {
     return _then(
       _$UserImpl(
-        id: null == id
+        id: freezed == id
             ? _value.id
             : id // ignore: cast_nullable_to_non_nullable
-                  as String,
-        email: null == email
+                  as String?,
+        email: freezed == email
             ? _value.email
             : email // ignore: cast_nullable_to_non_nullable
-                  as String,
-        name: null == name
+                  as String?,
+        name: freezed == name
             ? _value.name
             : name // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as String?,
         phone: freezed == phone
             ? _value.phone
             : phone // ignore: cast_nullable_to_non_nullable
                   as String?,
-        role: null == role
+        role: freezed == role
             ? _value.role
             : role // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as String?,
         adminSubRole: freezed == adminSubRole
             ? _value.adminSubRole
             : adminSubRole // ignore: cast_nullable_to_non_nullable
@@ -319,22 +310,18 @@ class __$$UserImplCopyWithImpl<$Res>
             ? _value.notifications
             : notifications // ignore: cast_nullable_to_non_nullable
                   as UserNotifications?,
-        hasPin: null == hasPin
-            ? _value.hasPin
-            : hasPin // ignore: cast_nullable_to_non_nullable
-                  as bool,
         pin: freezed == pin
             ? _value.pin
             : pin // ignore: cast_nullable_to_non_nullable
                   as String?,
-        createdAt: null == createdAt
+        createdAt: freezed == createdAt
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
-                  as String,
-        updatedAt: null == updatedAt
+                  as String?,
+        updatedAt: freezed == updatedAt
             ? _value.updatedAt
             : updatedAt // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as String?,
       ),
     );
   }
@@ -344,42 +331,43 @@ class __$$UserImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$UserImpl implements _User {
   const _$UserImpl({
-    required this.id,
-    required this.email,
-    required this.name,
+    this.id,
+    this.email,
+    this.name,
     this.phone,
-    required this.role,
+    this.role,
     this.adminSubRole,
-    required this.isVerified,
-    required this.biometricEnabled,
+    this.isVerified = false,
+    this.biometricEnabled = false,
     this.profilePhoto,
     this.referralCode,
     this.location,
     this.notifications,
-    required this.hasPin,
     this.pin,
-    required this.createdAt,
-    required this.updatedAt,
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory _$UserImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserImplFromJson(json);
 
   @override
-  final String id;
+  final String? id;
   @override
-  final String email;
+  final String? email;
   @override
-  final String name;
+  final String? name;
   @override
   final String? phone;
   @override
-  final String role;
+  final String? role;
   @override
   final String? adminSubRole;
   @override
+  @JsonKey()
   final bool isVerified;
   @override
+  @JsonKey()
   final bool biometricEnabled;
   @override
   final String? profilePhoto;
@@ -390,17 +378,15 @@ class _$UserImpl implements _User {
   @override
   final UserNotifications? notifications;
   @override
-  final bool hasPin;
-  @override
   final String? pin;
   @override
-  final String createdAt;
+  final String? createdAt;
   @override
-  final String updatedAt;
+  final String? updatedAt;
 
   @override
   String toString() {
-    return 'User(id: $id, email: $email, name: $name, phone: $phone, role: $role, adminSubRole: $adminSubRole, isVerified: $isVerified, biometricEnabled: $biometricEnabled, profilePhoto: $profilePhoto, referralCode: $referralCode, location: $location, notifications: $notifications, hasPin: $hasPin, pin: $pin, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'User(id: $id, email: $email, name: $name, phone: $phone, role: $role, adminSubRole: $adminSubRole, isVerified: $isVerified, biometricEnabled: $biometricEnabled, profilePhoto: $profilePhoto, referralCode: $referralCode, location: $location, notifications: $notifications, pin: $pin, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -427,7 +413,6 @@ class _$UserImpl implements _User {
                 other.location == location) &&
             (identical(other.notifications, notifications) ||
                 other.notifications == notifications) &&
-            (identical(other.hasPin, hasPin) || other.hasPin == hasPin) &&
             (identical(other.pin, pin) || other.pin == pin) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
@@ -451,7 +436,6 @@ class _$UserImpl implements _User {
     referralCode,
     location,
     notifications,
-    hasPin,
     pin,
     createdAt,
     updatedAt,
@@ -473,36 +457,35 @@ class _$UserImpl implements _User {
 
 abstract class _User implements User {
   const factory _User({
-    required final String id,
-    required final String email,
-    required final String name,
+    final String? id,
+    final String? email,
+    final String? name,
     final String? phone,
-    required final String role,
+    final String? role,
     final String? adminSubRole,
-    required final bool isVerified,
-    required final bool biometricEnabled,
+    final bool isVerified,
+    final bool biometricEnabled,
     final String? profilePhoto,
     final String? referralCode,
     final UserLocation? location,
     final UserNotifications? notifications,
-    required final bool hasPin,
     final String? pin,
-    required final String createdAt,
-    required final String updatedAt,
+    final String? createdAt,
+    final String? updatedAt,
   }) = _$UserImpl;
 
   factory _User.fromJson(Map<String, dynamic> json) = _$UserImpl.fromJson;
 
   @override
-  String get id;
+  String? get id;
   @override
-  String get email;
+  String? get email;
   @override
-  String get name;
+  String? get name;
   @override
   String? get phone;
   @override
-  String get role;
+  String? get role;
   @override
   String? get adminSubRole;
   @override
@@ -518,13 +501,11 @@ abstract class _User implements User {
   @override
   UserNotifications? get notifications;
   @override
-  bool get hasPin;
-  @override
   String? get pin;
   @override
-  String get createdAt;
+  String? get createdAt;
   @override
-  String get updatedAt;
+  String? get updatedAt;
 
   /// Create a copy of User
   /// with the given fields replaced by the non-null parameter values.

@@ -258,6 +258,78 @@ mixin _$AuthStore on _AuthStore, Store {
     return _$setupPinAsyncAction.run(() => super.setupPin(pin: pin));
   }
 
+  late final _$updatePinAsyncAction = AsyncAction(
+    '_AuthStore.updatePin',
+    context: context,
+  );
+
+  @override
+  Future<void> updatePin({required String oldPin, required String newPin}) {
+    return _$updatePinAsyncAction.run(
+      () => super.updatePin(oldPin: oldPin, newPin: newPin),
+    );
+  }
+
+  late final _$sendPasswordResetOtpAsyncAction = AsyncAction(
+    '_AuthStore.sendPasswordResetOtp',
+    context: context,
+  );
+
+  @override
+  Future<void> sendPasswordResetOtp({required String email}) {
+    return _$sendPasswordResetOtpAsyncAction.run(
+      () => super.sendPasswordResetOtp(email: email),
+    );
+  }
+
+  late final _$resetPasswordWithOtpAsyncAction = AsyncAction(
+    '_AuthStore.resetPasswordWithOtp',
+    context: context,
+  );
+
+  @override
+  Future<void> resetPasswordWithOtp({
+    required String email,
+    required String otp,
+    required String newPassword,
+  }) {
+    return _$resetPasswordWithOtpAsyncAction.run(
+      () => super.resetPasswordWithOtp(
+        email: email,
+        otp: otp,
+        newPassword: newPassword,
+      ),
+    );
+  }
+
+  late final _$sendPinResetOtpAsyncAction = AsyncAction(
+    '_AuthStore.sendPinResetOtp',
+    context: context,
+  );
+
+  @override
+  Future<void> sendPinResetOtp({required String email}) {
+    return _$sendPinResetOtpAsyncAction.run(
+      () => super.sendPinResetOtp(email: email),
+    );
+  }
+
+  late final _$forgotPinAsyncAction = AsyncAction(
+    '_AuthStore.forgotPin',
+    context: context,
+  );
+
+  @override
+  Future<void> forgotPin({
+    required String email,
+    required String otp,
+    required String newPin,
+  }) {
+    return _$forgotPinAsyncAction.run(
+      () => super.forgotPin(email: email, otp: otp, newPin: newPin),
+    );
+  }
+
   late final _$getProfileAsyncAction = AsyncAction(
     '_AuthStore.getProfile',
     context: context,
@@ -330,6 +402,16 @@ mixin _$AuthStore on _AuthStore, Store {
   @override
   Future<bool> checkAuthStatus() {
     return _$checkAuthStatusAsyncAction.run(() => super.checkAuthStatus());
+  }
+
+  late final _$getCurrentUserAsyncAction = AsyncAction(
+    '_AuthStore.getCurrentUser',
+    context: context,
+  );
+
+  @override
+  Future<void> getCurrentUser() {
+    return _$getCurrentUserAsyncAction.run(() => super.getCurrentUser());
   }
 
   late final _$logoutAsyncAction = AsyncAction(

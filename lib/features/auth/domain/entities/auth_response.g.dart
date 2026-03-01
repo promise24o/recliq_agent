@@ -8,7 +8,7 @@ part of 'auth_response.dart';
 
 _$AuthResponseImpl _$$AuthResponseImplFromJson(Map<String, dynamic> json) =>
     _$AuthResponseImpl(
-      message: json['message'] as String,
+      message: json['message'] as String?,
       user: json['user'] == null
           ? null
           : User.fromJson(json['user'] as Map<String, dynamic>),
@@ -28,7 +28,7 @@ Map<String, dynamic> _$$AuthResponseImplToJson(_$AuthResponseImpl instance) =>
 
 _$OtpResponseImpl _$$OtpResponseImplFromJson(Map<String, dynamic> json) =>
     _$OtpResponseImpl(
-      message: json['message'] as String,
+      message: json['message'] as String?,
       requiresOtp: json['requiresOtp'] as bool? ?? true,
     );
 
@@ -41,7 +41,7 @@ Map<String, dynamic> _$$OtpResponseImplToJson(_$OtpResponseImpl instance) =>
 _$ForgotPasswordResponseImpl _$$ForgotPasswordResponseImplFromJson(
   Map<String, dynamic> json,
 ) => _$ForgotPasswordResponseImpl(
-  message: json['message'] as String,
+  message: json['message'] as String?,
   email: json['email'] as String?,
   expiresIn: (json['expires_in'] as num?)?.toInt(),
 );
@@ -56,8 +56,8 @@ Map<String, dynamic> _$$ForgotPasswordResponseImplToJson(
 
 _$TokenResponseImpl _$$TokenResponseImplFromJson(Map<String, dynamic> json) =>
     _$TokenResponseImpl(
-      accessToken: json['accessToken'] as String,
-      refreshToken: json['refreshToken'] as String,
+      accessToken: json['accessToken'] as String?,
+      refreshToken: json['refreshToken'] as String?,
     );
 
 Map<String, dynamic> _$$TokenResponseImplToJson(_$TokenResponseImpl instance) =>
@@ -69,8 +69,8 @@ Map<String, dynamic> _$$TokenResponseImplToJson(_$TokenResponseImpl instance) =>
 _$PhotoUploadResponseImpl _$$PhotoUploadResponseImplFromJson(
   Map<String, dynamic> json,
 ) => _$PhotoUploadResponseImpl(
-  message: json['message'] as String,
-  profilePhoto: json['profilePhoto'] as String,
+  message: json['message'] as String?,
+  profilePhoto: json['profilePhoto'] as String?,
 );
 
 Map<String, dynamic> _$$PhotoUploadResponseImplToJson(

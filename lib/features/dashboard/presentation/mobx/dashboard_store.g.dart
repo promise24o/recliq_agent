@@ -107,6 +107,24 @@ mixin _$DashboardStore on _DashboardStore, Store {
     });
   }
 
+  late final _$_isTogglingOnlineAtom = Atom(
+    name: '_DashboardStore._isTogglingOnline',
+    context: context,
+  );
+
+  @override
+  bool get _isTogglingOnline {
+    _$_isTogglingOnlineAtom.reportRead();
+    return super._isTogglingOnline;
+  }
+
+  @override
+  set _isTogglingOnline(bool value) {
+    _$_isTogglingOnlineAtom.reportWrite(value, super._isTogglingOnline, () {
+      super._isTogglingOnline = value;
+    });
+  }
+
   late final _$loadDashboardAsyncAction = AsyncAction(
     '_DashboardStore.loadDashboard',
     context: context,

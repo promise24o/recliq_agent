@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:recliq_agent/core/errors/failures.dart';
 import 'package:recliq_agent/features/wallet/domain/entities/wallet.dart';
+import 'package:recliq_agent/features/wallet/domain/entities/bank.dart';
 
 abstract class WalletRepository {
   Future<Either<Failure, WalletData>> getWalletData();
@@ -17,5 +18,23 @@ abstract class WalletRepository {
     required double amount,
     required String mobileNumber,
     required String otp,
+  });
+
+  // Bank Account Management Methods
+  Future<Either<Failure, BanksResponse>> getSupportedBanks();
+  Future<Either<Failure, BankVerification>> verifyBankAccount({
+    required String bankCode,
+    required String accountNumber,
+  });
+  Future<Either<Failure, BankAccount>> linkBankAccount({
+    required String bankCode,
+    required String accountNumber,
+  });
+  Future<Either<Failure, BankAccountsResponse>> getBankAccounts();
+  Future<Either<Failure, BankAccount>> setDefaultBankAccount({
+    required String bankAccountId,
+  });
+  Future<Either<Failure, void>> removeBankAccount({
+    required String bankAccountId,
   });
 }

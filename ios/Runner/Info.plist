@@ -45,5 +45,19 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>R-Agent needs your location to show you on the map and match you with nearby pickup requests.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>R-Agent needs continuous location access to keep your position updated for pickup requests, even when the app is in the background.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>R-Agent needs continuous location access to keep your position updated for pickup requests.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
+	<key>NSUserNotificationsUsageDescription</key>
+	<string>We need your permission to send you important notifications about pickup requests and updates.</string>
 </dict>
 </plist>

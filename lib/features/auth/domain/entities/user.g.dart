@@ -7,14 +7,14 @@ part of 'user.dart';
 // **************************************************************************
 
 _$UserImpl _$$UserImplFromJson(Map<String, dynamic> json) => _$UserImpl(
-  id: json['id'] as String,
-  email: json['email'] as String,
-  name: json['name'] as String,
+  id: json['id'] as String?,
+  email: json['email'] as String?,
+  name: json['name'] as String?,
   phone: json['phone'] as String?,
-  role: json['role'] as String,
+  role: json['role'] as String?,
   adminSubRole: json['adminSubRole'] as String?,
-  isVerified: json['isVerified'] as bool,
-  biometricEnabled: json['biometricEnabled'] as bool,
+  isVerified: json['isVerified'] as bool? ?? false,
+  biometricEnabled: json['biometricEnabled'] as bool? ?? false,
   profilePhoto: json['profilePhoto'] as String?,
   referralCode: json['referralCode'] as String?,
   location: json['location'] == null
@@ -25,10 +25,9 @@ _$UserImpl _$$UserImplFromJson(Map<String, dynamic> json) => _$UserImpl(
       : UserNotifications.fromJson(
           json['notifications'] as Map<String, dynamic>,
         ),
-  hasPin: json['hasPin'] as bool,
   pin: json['pin'] as String?,
-  createdAt: json['createdAt'] as String,
-  updatedAt: json['updatedAt'] as String,
+  createdAt: json['createdAt'] as String?,
+  updatedAt: json['updatedAt'] as String?,
 );
 
 Map<String, dynamic> _$$UserImplToJson(_$UserImpl instance) =>
@@ -45,7 +44,6 @@ Map<String, dynamic> _$$UserImplToJson(_$UserImpl instance) =>
       'referralCode': instance.referralCode,
       'location': instance.location,
       'notifications': instance.notifications,
-      'hasPin': instance.hasPin,
       'pin': instance.pin,
       'createdAt': instance.createdAt,
       'updatedAt': instance.updatedAt,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:recliq_agent/shared/utils/toast_helper.dart';
 import 'package:recliq_agent/core/di/injection.dart';
 import 'package:recliq_agent/core/utils/currency_formatter.dart';
 import 'package:recliq_agent/features/jobs/domain/entities/job.dart';
@@ -301,13 +301,15 @@ class _JobsPageState extends State<JobsPage> with SingleTickerProviderStateMixin
   Future<void> _acceptJob(Job job) async {
     await _jobsStore.acceptJob(job.id);
     if (_jobsStore.successMessage != null) {
-      Fluttertoast.showToast(
-        msg: _jobsStore.successMessage!,
+      ToastHelper.showToast(
+        context,
+        _jobsStore.successMessage!,
         backgroundColor: AppTheme.successColor,
       );
     } else if (_jobsStore.errorMessage != null) {
-      Fluttertoast.showToast(
-        msg: _jobsStore.errorMessage!,
+      ToastHelper.showToast(
+        context,
+        _jobsStore.errorMessage!,
         backgroundColor: AppTheme.errorColor,
       );
     }

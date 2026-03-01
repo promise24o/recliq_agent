@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:recliq_agent/shared/utils/toast_helper.dart';
 import 'package:go_router/go_router.dart';
 import 'package:recliq_agent/core/di/injection.dart';
 import 'package:recliq_agent/features/auth/presentation/mobx/auth_store.dart';
@@ -66,8 +66,9 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
   Future<void> _handleVerify() async {
     final otp = _otpCode;
     if (otp.length != 6) {
-      Fluttertoast.showToast(
-        msg: 'Please enter the complete 6-digit OTP',
+      ToastHelper.showToast(
+        context,
+        'Please enter the complete 6-digit OTP',
         backgroundColor: AppTheme.warningColor,
       );
       return;
@@ -82,8 +83,9 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
     if (!mounted) return;
 
     if (_authStore.hasError) {
-      Fluttertoast.showToast(
-        msg: _authStore.errorMessage!,
+      ToastHelper.showToast(
+        context,
+        _authStore.errorMessage!,
         backgroundColor: AppTheme.errorColor,
       );
     } else if (success) {
@@ -95,18 +97,29 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
     if (!_canResend) return;
 
     _authStore.clearMessages();
+    
+    // Clear all input fields
+    for (var controller in _controllers) {
+      controller.clear();
+    }
+    
+    // Reset focus to first field
+    _focusNodes[0].requestFocus();
+    
     await _authStore.resendOtp(identifier: widget.identifier);
 
     if (!mounted) return;
 
     if (_authStore.hasError) {
-      Fluttertoast.showToast(
-        msg: _authStore.errorMessage!,
+      ToastHelper.showToast(
+        context,
+        _authStore.errorMessage!,
         backgroundColor: AppTheme.errorColor,
       );
     } else {
-      Fluttertoast.showToast(
-        msg: 'OTP resent successfully',
+      ToastHelper.showToast(
+        context,
+        'OTP resent successfully',
         backgroundColor: AppTheme.successColor,
       );
       _startResendTimer();
@@ -122,12 +135,15 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
         child: Scaffold(
           body: Container(
             decoration: const BoxDecoration(gradient: AppTheme.darkGradient),
-            child: SafeArea(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(AppTheme.spacing24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+            child: Column(
+              children: [
+                const SafeArea(child: SizedBox()),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(AppTheme.spacing24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                     const SizedBox(height: AppTheme.spacing24),
                     GestureDetector(
                       onTap: () => context.pop(),
@@ -247,8 +263,10 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                             ),
                     ),
                   ],
-                ),
-              ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
         ),

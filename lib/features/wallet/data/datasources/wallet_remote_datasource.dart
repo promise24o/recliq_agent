@@ -1,6 +1,9 @@
 import 'package:injectable/injectable.dart';
+import 'package:dio/dio.dart';
+import 'package:recliq_agent/core/errors/exceptions.dart';
 import 'package:recliq_agent/core/network/dio_client.dart';
 import 'package:recliq_agent/features/wallet/domain/entities/wallet.dart';
+import 'package:recliq_agent/features/wallet/domain/entities/bank.dart';
 
 abstract class WalletRemoteDataSource {
   Future<WalletData> getWalletData();
@@ -17,6 +20,24 @@ abstract class WalletRemoteDataSource {
     required double amount,
     required String mobileNumber,
     required String otp,
+  });
+
+  // Bank Account Management Methods
+  Future<BanksResponse> getSupportedBanks();
+  Future<BankVerification> verifyBankAccount({
+    required String bankCode,
+    required String accountNumber,
+  });
+  Future<BankAccount> linkBankAccount({
+    required String bankCode,
+    required String accountNumber,
+  });
+  Future<BankAccountsResponse> getBankAccounts();
+  Future<BankAccount> setDefaultBankAccount({
+    required String bankAccountId,
+  });
+  Future<void> removeBankAccount({
+    required String bankAccountId,
   });
 }
 
@@ -173,5 +194,86 @@ class WalletRemoteDataSourceImpl implements WalletRemoteDataSource {
       fee: 50.0,
       createdAt: DateTime.now().toIso8601String(),
     );
+  }
+
+  @override
+  Future<BanksResponse> getSupportedBanks() async {
+    final response = await _dioClient.get('/wallet/banks');
+    return BanksResponse.fromJson(response.data);
+  }
+
+  @override
+  Future<BankVerification> verifyBankAccount({
+    required String bankCode,
+    required String accountNumber,
+  }) async {
+    final response = await _dioClient.post('/wallet/bank/verify', data: {
+      'bankCode': bankCode,
+      'accountNumber': accountNumber,
+    });
+    return BankVerification.fromJson(response.data);
+  }
+
+  @override
+  Future<BankAccount> linkBankAccount({
+    required String bankCode,
+    required String accountNumber,
+  }) async {
+    final response = await _dioClient.post('/wallet/bank/link', data: {
+      'bankCode': bankCode,
+      'accountNumber': accountNumber,
+    });
+    return BankAccount.fromJson(response.data);
+  }
+
+  @override
+  Future<BankAccountsResponse> getBankAccounts() async {
+    final response = await _dioClient.get('/wallet/bank/accounts');
+    return BankAccountsResponse.fromJson(response.data);
+  }
+
+  @override
+  Future<BankAccount> setDefaultBankAccount({
+    required String bankAccountId,
+  }) async {
+    final response = await _dioClient.post('/wallet/bank/set-default', data: {
+      'bankAccountId': bankAccountId,
+    });
+    return BankAccount.fromJson(response.data);
+  }
+
+  @override
+  Future<void> removeBankAccount({
+    required String bankAccountId,
+  }) async {
+    try {
+      await _dioClient.post('/wallet/bank/remove', data: {
+        'bankAccountId': bankAccountId,
+      });
+    } on DioException catch (e) {
+      throw ServerException(
+        message: _extractErrorMessage(e),
+        statusCode: e.response?.statusCode,
+      );
+    }
+  }
+
+  String _extractErrorMessage(DioException e) {
+    if (e.response?.data is Map<String, dynamic>) {
+      return (e.response!.data as Map<String, dynamic>)['message']
+              as String? ??
+          'An unexpected error occurred';
+    }
+    if (e.type == DioExceptionType.connectionTimeout ||
+        e.type == DioExceptionType.receiveTimeout) {
+      return 'Connection timed out. Please try again.';
+    }
+    if (e.type == DioExceptionType.connectionError) {
+      return 'No internet connection. Please check your network.';
+    }
+    if (e.type == DioExceptionType.badResponse) {
+      return 'Server error occurred. Please try again.';
+    }
+    return 'An unexpected error occurred. Please try again.';
   }
 }

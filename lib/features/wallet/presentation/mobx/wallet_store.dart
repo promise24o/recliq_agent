@@ -1,7 +1,9 @@
 import 'package:injectable/injectable.dart';
 import 'package:mobx/mobx.dart';
 import 'package:recliq_agent/features/wallet/domain/entities/wallet.dart';
+import 'package:recliq_agent/features/wallet/domain/entities/bank.dart';
 import 'package:recliq_agent/features/wallet/domain/repositories/wallet_repository.dart';
+import 'package:recliq_agent/shared/services/cache_service.dart';
 
 part 'wallet_store.g.dart';
 
@@ -26,6 +28,15 @@ abstract class _WalletStore with Store {
   ObservableList<WithdrawalRequest> withdrawals = ObservableList<WithdrawalRequest>();
 
   @observable
+  ObservableList<Bank> supportedBanks = ObservableList<Bank>();
+
+  @observable
+  ObservableList<BankAccount> bankAccounts = ObservableList<BankAccount>();
+
+  @observable
+  BankVerification? bankVerification;
+
+  @observable
   bool isLoading = false;
 
   @observable
@@ -38,6 +49,41 @@ abstract class _WalletStore with Store {
   void clearMessages() {
     errorMessage = null;
     successMessage = null;
+  }
+
+  @action
+  void clearBankVerification() {
+    bankVerification = null;
+  }
+
+  @action
+  Future<void> clearBanksCache() async {
+    await CacheService.clearBanksCache();
+  }
+
+  @action
+  Future<bool> removeBankAccount({required String bankAccountId}) async {
+    isLoading = true;
+    errorMessage = null;
+    final result = await _repository.removeBankAccount(bankAccountId: bankAccountId);
+    bool success = false;
+    result.fold(
+      (failure) {
+        errorMessage = failure.message;
+        success = false;
+      },
+      (_) {
+        successMessage = 'Bank account removed successfully';
+        success = true;
+      },
+    );
+    
+    if (success) {
+      await loadBankAccounts(); // Refresh the list
+    }
+    
+    isLoading = false;
+    return success;
   }
 
   @action
@@ -145,5 +191,133 @@ abstract class _WalletStore with Store {
     );
     isLoading = false;
     return success;
+  }
+
+  // Bank Account Management Methods
+  @action
+  Future<void> loadSupportedBanks({bool forceRefresh = false}) async {
+    // Try to load from cache first (unless force refresh)
+    if (!forceRefresh) {
+      final hasValidCache = await CacheService.hasValidBanksCache();
+      if (hasValidCache) {
+        final cachedBanks = await CacheService.getCachedBanks();
+        if (cachedBanks != null) {
+          supportedBanks = ObservableList.of(cachedBanks);
+          return;
+        }
+      }
+    }
+
+    // Load from API
+    isLoading = true;
+    errorMessage = null;
+    final result = await _repository.getSupportedBanks();
+    result.fold(
+      (failure) => errorMessage = failure.message,
+      (response) {
+        supportedBanks = ObservableList.of(response.banks);
+        // Cache the banks for future use
+        CacheService.cacheBanks(response.banks);
+      },
+    );
+    isLoading = false;
+  }
+
+  @action
+  Future<bool> verifyBankAccount({
+    required String bankCode,
+    required String accountNumber,
+  }) async {
+    isLoading = true;
+    clearMessages();
+    final result = await _repository.verifyBankAccount(
+      bankCode: bankCode,
+      accountNumber: accountNumber,
+    );
+    bool success = false;
+    result.fold(
+      (failure) => errorMessage = failure.message,
+      (verification) {
+        bankVerification = verification;
+        success = verification.status;
+        if (success) {
+          successMessage = 'Account verified successfully';
+        }
+      },
+    );
+    isLoading = false;
+    return success;
+  }
+
+  @action
+  Future<bool> linkBankAccount({
+    required String bankCode,
+    required String accountNumber,
+  }) async {
+    isLoading = true;
+    clearMessages();
+    final result = await _repository.linkBankAccount(
+      bankCode: bankCode,
+      accountNumber: accountNumber,
+    );
+    bool success = false;
+    result.fold(
+      (failure) => errorMessage = failure.message,
+      (account) {
+        successMessage = 'Bank account linked successfully';
+        bankAccounts.insert(0, account);
+        success = true;
+      },
+    );
+    isLoading = false;
+    return success;
+  }
+
+  @action
+  Future<void> loadBankAccounts() async {
+    isLoading = true;
+    errorMessage = null;
+    final result = await _repository.getBankAccounts();
+    result.fold(
+      (failure) => errorMessage = failure.message,
+      (response) => bankAccounts = ObservableList.of(response.bankAccounts),
+    );
+    isLoading = false;
+  }
+
+  @action
+  Future<bool> setDefaultBankAccount({
+    required String bankAccountId,
+  }) async {
+    isLoading = true;
+    clearMessages();
+    final result = await _repository.setDefaultBankAccount(
+      bankAccountId: bankAccountId,
+    );
+    bool success = false;
+    result.fold(
+      (failure) => errorMessage = failure.message,
+      (account) {
+        successMessage = 'Default bank account updated';
+        success = true;
+      },
+    );
+    
+    if (success) {
+      await loadBankAccounts();
+    }
+    
+    isLoading = false;
+    return success;
+  }
+
+  @action
+  Future<void> loadBankData() async {
+    isLoading = true;
+    await Future.wait([
+      loadSupportedBanks(),
+      loadBankAccounts(),
+    ]);
+    isLoading = false;
   }
 }

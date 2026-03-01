@@ -4,6 +4,7 @@ import 'package:recliq_agent/core/errors/exceptions.dart';
 import 'package:recliq_agent/core/errors/failures.dart';
 import 'package:recliq_agent/features/wallet/data/datasources/wallet_remote_datasource.dart';
 import 'package:recliq_agent/features/wallet/domain/entities/wallet.dart';
+import 'package:recliq_agent/features/wallet/domain/entities/bank.dart';
 import 'package:recliq_agent/features/wallet/domain/repositories/wallet_repository.dart';
 
 @LazySingleton(as: WalletRepository)
@@ -95,6 +96,96 @@ class WalletRepositoryImpl implements WalletRepository {
         otp: otp,
       );
       return Right(result);
+    } on ServerException catch (e) {
+      return Left(Failure.serverError(e.message));
+    } catch (e) {
+      return Left(Failure.unknownError(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, BanksResponse>> getSupportedBanks() async {
+    try {
+      final result = await _remoteDataSource.getSupportedBanks();
+      return Right(result);
+    } on ServerException catch (e) {
+      return Left(Failure.serverError(e.message));
+    } catch (e) {
+      return Left(Failure.unknownError(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, BankVerification>> verifyBankAccount({
+    required String bankCode,
+    required String accountNumber,
+  }) async {
+    try {
+      final result = await _remoteDataSource.verifyBankAccount(
+        bankCode: bankCode,
+        accountNumber: accountNumber,
+      );
+      return Right(result);
+    } on ServerException catch (e) {
+      return Left(Failure.serverError(e.message));
+    } catch (e) {
+      return Left(Failure.unknownError(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, BankAccount>> linkBankAccount({
+    required String bankCode,
+    required String accountNumber,
+  }) async {
+    try {
+      final result = await _remoteDataSource.linkBankAccount(
+        bankCode: bankCode,
+        accountNumber: accountNumber,
+      );
+      return Right(result);
+    } on ServerException catch (e) {
+      return Left(Failure.serverError(e.message));
+    } catch (e) {
+      return Left(Failure.unknownError(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, BankAccountsResponse>> getBankAccounts() async {
+    try {
+      final result = await _remoteDataSource.getBankAccounts();
+      return Right(result);
+    } on ServerException catch (e) {
+      return Left(Failure.serverError(e.message));
+    } catch (e) {
+      return Left(Failure.unknownError(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, BankAccount>> setDefaultBankAccount({
+    required String bankAccountId,
+  }) async {
+    try {
+      final result = await _remoteDataSource.setDefaultBankAccount(
+        bankAccountId: bankAccountId,
+      );
+      return Right(result);
+    } on ServerException catch (e) {
+      return Left(Failure.serverError(e.message));
+    } catch (e) {
+      return Left(Failure.unknownError(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> removeBankAccount({
+    required String bankAccountId,
+  }) async {
+    try {
+      await _remoteDataSource.removeBankAccount(bankAccountId: bankAccountId);
+      return const Right(null);
     } on ServerException catch (e) {
       return Left(Failure.serverError(e.message));
     } catch (e) {

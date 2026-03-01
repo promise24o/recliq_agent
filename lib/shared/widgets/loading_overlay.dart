@@ -21,11 +21,14 @@ class LoadingOverlay extends StatelessWidget {
         child ?? const SizedBox(),
         if (isVisible)
           Positioned.fill(
-            child: Container(
-              color: Colors.black.withValues(alpha: 0.7),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-                child: const _PulseLoadingContent(),
+            child: Material(
+              type: MaterialType.transparency,
+              child: Container(
+                color: Colors.black.withOpacity(0.7),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                  child: _PulseLoadingContent(message: message ?? ''),
+                ),
               ),
             ),
           ),
@@ -35,7 +38,9 @@ class LoadingOverlay extends StatelessWidget {
 }
 
 class _PulseLoadingContent extends StatefulWidget {
-  const _PulseLoadingContent();
+  final String? message;
+
+  const _PulseLoadingContent({this.message});
 
   @override
   State<_PulseLoadingContent> createState() => _PulseLoadingContentState();
@@ -73,51 +78,69 @@ class _PulseLoadingContentState extends State<_PulseLoadingContent>
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (_, __) {
-          return Opacity(
-            opacity: _opacity.value,
-            child: Transform.scale(
-              scale: _scale.value,
-              child: Container(
-                width: 84,
-                height: 84,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(22),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppTheme.primaryGreen.withValues(alpha: 0.35),
-                      blurRadius: 26,
-                      spreadRadius: 2,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AnimatedBuilder(
+            animation: _controller,
+            builder: (_, __) {
+              return Opacity(
+                opacity: _opacity.value,
+                child: Transform.scale(
+                  scale: _scale.value,
+                  child: Container(
+                    width: 84,
+                    height: 84,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(22),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppTheme.primaryGreen.withOpacity(0.35),
+                          blurRadius: 26,
+                          spreadRadius: 2,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(22),
-                  child: Image.asset(
-                    'assets/images/launcher-icon.png',
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: AppTheme.surfaceDark,
-                          borderRadius: BorderRadius.circular(22),
-                          border: Border.all(color: AppTheme.borderSoft),
-                        ),
-                        child: const Icon(
-                          Icons.recycling_rounded,
-                          size: 42,
-                          color: AppTheme.primaryGreen,
-                        ),
-                      );
-                    },
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(22),
+                      child: Image.asset(
+                        'assets/images/app-icon-white.png',
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: AppTheme.surfaceDark,
+                              borderRadius: BorderRadius.circular(22),
+                              border: Border.all(color: AppTheme.borderSoft),
+                            ),
+                            child: const Icon(
+                              Icons.recycling_rounded,
+                              size: 42,
+                              color: AppTheme.primaryGreen,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                   ),
                 ),
+              );
+            },
+          ),
+          if (widget.message != null) ...[
+            const SizedBox(height: 24),
+            Text(
+              widget.message!,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                letterSpacing: 0.3,
               ),
+              textAlign: TextAlign.center,
             ),
-          );
-        },
+          ],
+        ],
       ),
     );
   }

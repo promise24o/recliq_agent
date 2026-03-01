@@ -226,6 +226,106 @@ abstract class _AuthStore with Store {
   }
 
   @action
+  Future<void> updatePin({
+    required String oldPin,
+    required String newPin,
+  }) async {
+    isLoading = true;
+    errorMessage = null;
+
+    final result = await _repository.updatePin(
+      oldPin: oldPin,
+      newPin: newPin,
+    );
+
+    result.fold(
+      (failure) => errorMessage = failure.message,
+      (message) => successMessage = message,
+    );
+
+    isLoading = false;
+  }
+
+  @action
+  Future<void> sendPasswordResetOtp({required String email}) async {
+    isLoading = true;
+    errorMessage = null;
+
+    final result = await _repository.forgotPassword(email: email);
+
+    result.fold(
+      (failure) => errorMessage = failure.message,
+      (response) => successMessage = response.message,
+    );
+
+    isLoading = false;
+  }
+
+  @action
+  Future<void> resetPasswordWithOtp({
+    required String email,
+    required String otp,
+    required String newPassword,
+  }) async {
+    isLoading = true;
+    errorMessage = null;
+
+    final result = await _repository.resetPassword(
+      email: email,
+      otp: otp,
+      newPassword: newPassword,
+    );
+
+    result.fold(
+      (failure) => errorMessage = failure.message,
+      (authResponse) {
+        successMessage = 'Password reset successfully';
+        currentUser = authResponse.user;
+      },
+    );
+
+    isLoading = false;
+  }
+
+  @action
+  Future<void> sendPinResetOtp({required String email}) async {
+    isLoading = true;
+    errorMessage = null;
+
+    final result = await _repository.sendPinResetOtp(email: email);
+
+    result.fold(
+      (failure) => errorMessage = failure.message,
+      (response) => successMessage = response.message,
+    );
+
+    isLoading = false;
+  }
+
+  @action
+  Future<void> forgotPin({
+    required String email,
+    required String otp,
+    required String newPin,
+  }) async {
+    isLoading = true;
+    errorMessage = null;
+
+    final result = await _repository.forgotPin(
+      email: email,
+      otp: otp,
+      newPin: newPin,
+    );
+
+    result.fold(
+      (failure) => errorMessage = failure.message,
+      (message) => successMessage = message,
+    );
+
+    isLoading = false;
+  }
+
+  @action
   Future<void> getProfile() async {
     isLoading = true;
     errorMessage = null;
@@ -234,7 +334,11 @@ abstract class _AuthStore with Store {
 
     result.fold(
       (failure) => errorMessage = failure.message,
-      (user) => currentUser = user,
+      (user) {
+        runInAction(() {
+          currentUser = user;
+        });
+      },
     );
 
     isLoading = false;
@@ -303,7 +407,13 @@ abstract class _AuthStore with Store {
 
     result.fold(
       (failure) => errorMessage = failure.message,
-      (message) => successMessage = message,
+      (message) {
+        successMessage = message;
+        // Update local state immediately
+        if (currentUser != null) {
+          currentUser = currentUser!.copyWith(biometricEnabled: enabled);
+        }
+      },
     );
 
     isLoading = false;
@@ -319,6 +429,25 @@ abstract class _AuthStore with Store {
         return loggedIn;
       },
     );
+  }
+
+  @action
+  Future<void> getCurrentUser() async {
+    isLoading = true;
+    errorMessage = null;
+
+    final result = await _repository.getProfile();
+
+    result.fold(
+      (failure) => errorMessage = failure.message,
+      (user) {
+        runInAction(() {
+          currentUser = user;
+        });
+      },
+    );
+
+    isLoading = false;
   }
 
   @action

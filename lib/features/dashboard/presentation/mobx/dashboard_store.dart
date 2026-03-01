@@ -1,5 +1,8 @@
+import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:mobx/mobx.dart';
+import 'package:recliq_agent/core/services/agent_location_service.dart';
+import 'package:recliq_agent/features/availability/domain/repositories/availability_repository.dart';
 import 'package:recliq_agent/features/dashboard/domain/entities/dashboard_data.dart';
 import 'package:recliq_agent/features/dashboard/domain/repositories/dashboard_repository.dart';
 
@@ -12,6 +15,9 @@ abstract class _DashboardStore with Store {
   final DashboardRepository _repository;
 
   _DashboardStore(this._repository);
+
+  AvailabilityRepository get _availabilityRepository => GetIt.instance<AvailabilityRepository>();
+  AgentLocationService get _locationService => GetIt.instance<AgentLocationService>();
 
   @observable
   DashboardData? dashboardData;
@@ -28,6 +34,9 @@ abstract class _DashboardStore with Store {
   @observable
   bool isOnline = true;
 
+  @observable
+  bool _isTogglingOnline = false;
+
   @computed
   bool get hasData => dashboardData != null;
 
@@ -41,7 +50,10 @@ abstract class _DashboardStore with Store {
       (failure) => errorMessage = failure.message,
       (data) {
         dashboardData = data;
-        isOnline = data.isOnline;
+        // Don't overwrite if user is currently toggling online status
+        if (!_isTogglingOnline) {
+          isOnline = data.isOnline;
+        }
       },
     );
 
@@ -60,11 +72,31 @@ abstract class _DashboardStore with Store {
   @action
   Future<void> toggleOnline() async {
     final newStatus = !isOnline;
-    final result = await _repository.toggleOnlineStatus(newStatus);
-    result.fold(
-      (failure) => errorMessage = failure.message,
-      (_) => isOnline = newStatus,
-    );
+    
+    // Set flag to prevent loadDashboard from overwriting
+    _isTogglingOnline = true;
+    
+    // Optimistic update - update UI immediately
+    isOnline = newStatus;
+    
+    try {
+      final success = await _availabilityRepository.updateOnlineStatus(newStatus);
+      if (!success) {
+        errorMessage = 'Failed to update online status';
+      } else {
+        // Start/stop location tracking based on online status
+        if (newStatus) {
+          await _locationService.goOnline();
+        } else {
+          _locationService.goOffline();
+        }
+      }
+    } catch (e) {
+      errorMessage = 'Sync issue: ${e.toString()}';
+    }
+    
+    // Clear flag after operation completes
+    _isTogglingOnline = false;
   }
 
   @action

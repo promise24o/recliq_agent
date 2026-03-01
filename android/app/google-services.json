@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "328703267342",
+    "project_id": "recliq-f8c07",
+    "storage_bucket": "recliq-f8c07.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:328703267342:android:388423051fde0c0537a25f",
+        "android_client_info": {
+          "package_name": "com.recliq.agent"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCS-2CRKdAPpriCDrJzdGc4TkoPZ40BCOg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:328703267342:android:94d1d0e0382b9f8637a25f",
+        "android_client_info": {
+          "package_name": "com.recliq.user"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCS-2CRKdAPpriCDrJzdGc4TkoPZ40BCOg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

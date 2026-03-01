@@ -7,7 +7,7 @@ part 'auth_response.g.dart';
 @freezed
 class AuthResponse with _$AuthResponse {
   const factory AuthResponse({
-    required String message,
+    String? message,
     User? user,
     String? accessToken,
     String? refreshToken,
@@ -21,7 +21,7 @@ class AuthResponse with _$AuthResponse {
 @freezed
 class OtpResponse with _$OtpResponse {
   const factory OtpResponse({
-    required String message,
+    String? message,
     @Default(true) bool requiresOtp,
   }) = _OtpResponse;
 
@@ -32,7 +32,7 @@ class OtpResponse with _$OtpResponse {
 @freezed
 class ForgotPasswordResponse with _$ForgotPasswordResponse {
   const factory ForgotPasswordResponse({
-    required String message,
+    String? message,
     String? email,
     @JsonKey(name: 'expires_in') int? expiresIn,
   }) = _ForgotPasswordResponse;
@@ -44,8 +44,8 @@ class ForgotPasswordResponse with _$ForgotPasswordResponse {
 @freezed
 class TokenResponse with _$TokenResponse {
   const factory TokenResponse({
-    required String accessToken,
-    required String refreshToken,
+    String? accessToken,
+    String? refreshToken,
   }) = _TokenResponse;
 
   factory TokenResponse.fromJson(Map<String, dynamic> json) =>
@@ -55,8 +55,8 @@ class TokenResponse with _$TokenResponse {
 @freezed
 class PhotoUploadResponse with _$PhotoUploadResponse {
   const factory PhotoUploadResponse({
-    required String message,
-    required String profilePhoto,
+    String? message,
+    String? profilePhoto,
   }) = _PhotoUploadResponse;
 
   factory PhotoUploadResponse.fromJson(Map<String, dynamic> json) =>

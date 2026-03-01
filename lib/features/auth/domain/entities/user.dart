@@ -6,25 +6,28 @@ part 'user.g.dart';
 @freezed
 class User with _$User {
   const factory User({
-    required String id,
-    required String email,
-    required String name,
+    String? id,
+    String? email,
+    String? name,
     String? phone,
-    required String role,
+    String? role,
     String? adminSubRole,
-    required bool isVerified,
-    required bool biometricEnabled,
+    @Default(false) bool isVerified,
+    @Default(false) bool biometricEnabled,
     String? profilePhoto,
     String? referralCode,
     UserLocation? location,
     UserNotifications? notifications,
-    required bool hasPin,
     String? pin,
-    required String createdAt,
-    required String updatedAt,
+    String? createdAt,
+    String? updatedAt,
   }) = _User;
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+}
+
+extension UserExtension on User {
+  bool get hasPin => pin != null && pin!.isNotEmpty;
 }
 
 @freezed

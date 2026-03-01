@@ -30,6 +30,7 @@ class MetricCard extends StatelessWidget {
       onTap: onTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -88,11 +89,11 @@ class MetricCard extends StatelessWidget {
                 ),
             ],
           ),
-          const SizedBox(height: AppTheme.spacing12),
+          const SizedBox(height: AppTheme.spacing8),
           Text(
             value,
             style: const TextStyle(
-              fontSize: 22,
+              fontSize: 20,
               fontWeight: FontWeight.w700,
               color: AppTheme.textPrimary,
             ),

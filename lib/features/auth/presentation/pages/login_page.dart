@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:recliq_agent/shared/utils/toast_helper.dart';
 import 'package:go_router/go_router.dart';
 import 'package:recliq_agent/core/di/injection.dart';
 import 'package:recliq_agent/core/utils/validators.dart';
@@ -43,8 +43,9 @@ class _LoginPageState extends State<LoginPage> {
     if (!mounted) return;
 
     if (_authStore.hasError) {
-      Fluttertoast.showToast(
-        msg: _authStore.errorMessage!,
+      ToastHelper.showToast(
+        context,
+        _authStore.errorMessage!,
         backgroundColor: AppTheme.errorColor,
       );
     } else if (_authStore.requiresOtp) {
@@ -59,7 +60,7 @@ class _LoginPageState extends State<LoginPage> {
     return Observer(
       builder: (_) => LoadingOverlay(
         isVisible: _authStore.isLoading,
-        message: 'Signing in...',
+        message: 'Signing In...',
         child: Scaffold(
           body: Container(
             decoration: const BoxDecoration(gradient: AppTheme.darkGradient),

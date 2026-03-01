@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -24,28 +25,64 @@ class _PinAuthPageState extends State<PinAuthPage> {
   @override
   void initState() {
     super.initState();
+    // Load user profile and check biometrics
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadUserProfile();
+    });
+  }
+
+  Future<void> _loadUserProfile() async {
+    await _authStore.getProfile();
     _checkBiometric();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Re-check biometrics when dependencies change (user data loaded)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkBiometric();
+      // Retry after a short delay to ensure user data is loaded
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) _checkBiometric();
+      });
+    });
   }
 
   Future<void> _checkBiometric() async {
     try {
       final canCheck = await _localAuth.canCheckBiometrics;
       final isDeviceSupported = await _localAuth.isDeviceSupported();
+      final currentUser = _authStore.currentUser;
+      final biometricEnabled = currentUser?.biometricEnabled == true;
+      
+      print('BIO DEBUG: canCheck=$canCheck, supported=$isDeviceSupported');
+      print('BIO DEBUG: currentUser=${currentUser?.name}');
+      print('BIO DEBUG: currentUser?.biometricEnabled=${currentUser?.biometricEnabled}');
+      print('BIO DEBUG: enabled=$biometricEnabled');
+      
       setState(() {
-        _biometricAvailable = canCheck && isDeviceSupported;
+        // For development/emulator: show icon if user has enabled biometrics
+        // In production: require device support
+        _biometricAvailable = biometricEnabled && (canCheck && isDeviceSupported || kDebugMode);
       });
 
-      if (_biometricAvailable &&
-          _authStore.currentUser?.biometricEnabled == true) {
+      print('BIO DEBUG: _biometricAvailable=$_biometricAvailable');
+
+      if (_biometricAvailable && biometricEnabled && isDeviceSupported) {
         _authenticateWithBiometric();
       }
-    } catch (_) {
-      _biometricAvailable = false;
+    } catch (e) {
+      print('BIO DEBUG: Error=$e');
+      setState(() {
+        _biometricAvailable = false;
+      });
     }
   }
 
   Future<void> _authenticateWithBiometric() async {
     try {
+      print('[Biometric] Starting authentication...');
       final authenticated = await _localAuth.authenticate(
         localizedReason: 'Authenticate to access R-Agent',
         options: const AuthenticationOptions(
@@ -53,21 +90,37 @@ class _PinAuthPageState extends State<PinAuthPage> {
           biometricOnly: true,
         ),
       );
+      print('[Biometric] Authentication result: $authenticated');
       if (authenticated && mounted) {
+        HapticFeedback.lightImpact();
         context.go('/dashboard');
       }
-    } catch (_) {}
+    } on PlatformException catch (e) {
+      print('[Biometric] PlatformException: ${e.code} - ${e.message}');
+      // Handle specific errors
+      if (e.code == 'NotAvailable') {
+        print('[Biometric] Biometric not available on this device');
+      } else if (e.code == 'NotEnrolled') {
+        print('[Biometric] No biometrics enrolled on device');
+      } else if (e.code == 'LockedOut') {
+        print('[Biometric] Too many attempts, locked out');
+      } else if (e.code == 'PermanentlyLockedOut') {
+        print('[Biometric] Permanently locked out');
+      }
+    } catch (e) {
+      print('[Biometric] Error: $e');
+    }
   }
 
   void _onKeyPressed(String key) {
-    if (_enteredPin.length >= 6) return;
+    if (_enteredPin.length >= 4) return;
 
     setState(() {
       _isError = false;
       _enteredPin += key;
     });
 
-    if (_enteredPin.length == 6) {
+    if (_enteredPin.length == 4) {
       _verifyPin();
     }
   }
@@ -140,21 +193,11 @@ class _PinAuthPageState extends State<PinAuthPage> {
                   AppTheme.primaryGreen.withValues(alpha: 0.2),
               backgroundImage: user?.profilePhoto != null
                   ? NetworkImage(user!.profilePhoto!)
-                  : null,
-              child: user?.profilePhoto == null
-                  ? Text(
-                      (user?.name ?? 'A')[0].toUpperCase(),
-                      style: const TextStyle(
-                        color: AppTheme.primaryGreen,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 28,
-                      ),
-                    )
-                  : null,
+                  : const AssetImage('assets/images/avatar.png'),
             ),
             const SizedBox(height: AppTheme.spacing16),
             Text(
-              'Welcome back, ${user?.name != null ? user!.name.split(' ').first : 'Agent'}',
+              'Welcome back, ${user?.name?.split(' ').first ?? 'Agent'}',
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
@@ -178,7 +221,7 @@ class _PinAuthPageState extends State<PinAuthPage> {
   Widget _buildPinDots() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(6, (index) {
+      children: List.generate(4, (index) {
         final isFilled = index < _enteredPin.length;
         return AnimatedContainer(
           duration: const Duration(milliseconds: 200),
@@ -207,6 +250,7 @@ class _PinAuthPageState extends State<PinAuthPage> {
   }
 
   Widget _buildKeypad() {
+    print('BIO DEBUG: Building keypad, _biometricAvailable=$_biometricAvailable');
     final keys = [
       ['1', '2', '3'],
       ['4', '5', '6'],

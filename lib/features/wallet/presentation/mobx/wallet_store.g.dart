@@ -81,6 +81,60 @@ mixin _$WalletStore on _WalletStore, Store {
     });
   }
 
+  late final _$supportedBanksAtom = Atom(
+    name: '_WalletStore.supportedBanks',
+    context: context,
+  );
+
+  @override
+  ObservableList<Bank> get supportedBanks {
+    _$supportedBanksAtom.reportRead();
+    return super.supportedBanks;
+  }
+
+  @override
+  set supportedBanks(ObservableList<Bank> value) {
+    _$supportedBanksAtom.reportWrite(value, super.supportedBanks, () {
+      super.supportedBanks = value;
+    });
+  }
+
+  late final _$bankAccountsAtom = Atom(
+    name: '_WalletStore.bankAccounts',
+    context: context,
+  );
+
+  @override
+  ObservableList<BankAccount> get bankAccounts {
+    _$bankAccountsAtom.reportRead();
+    return super.bankAccounts;
+  }
+
+  @override
+  set bankAccounts(ObservableList<BankAccount> value) {
+    _$bankAccountsAtom.reportWrite(value, super.bankAccounts, () {
+      super.bankAccounts = value;
+    });
+  }
+
+  late final _$bankVerificationAtom = Atom(
+    name: '_WalletStore.bankVerification',
+    context: context,
+  );
+
+  @override
+  BankVerification? get bankVerification {
+    _$bankVerificationAtom.reportRead();
+    return super.bankVerification;
+  }
+
+  @override
+  set bankVerification(BankVerification? value) {
+    _$bankVerificationAtom.reportWrite(value, super.bankVerification, () {
+      super.bankVerification = value;
+    });
+  }
+
   late final _$isLoadingAtom = Atom(
     name: '_WalletStore.isLoading',
     context: context,
@@ -133,6 +187,28 @@ mixin _$WalletStore on _WalletStore, Store {
     _$successMessageAtom.reportWrite(value, super.successMessage, () {
       super.successMessage = value;
     });
+  }
+
+  late final _$clearBanksCacheAsyncAction = AsyncAction(
+    '_WalletStore.clearBanksCache',
+    context: context,
+  );
+
+  @override
+  Future<void> clearBanksCache() {
+    return _$clearBanksCacheAsyncAction.run(() => super.clearBanksCache());
+  }
+
+  late final _$removeBankAccountAsyncAction = AsyncAction(
+    '_WalletStore.removeBankAccount',
+    context: context,
+  );
+
+  @override
+  Future<bool> removeBankAccount({required String bankAccountId}) {
+    return _$removeBankAccountAsyncAction.run(
+      () => super.removeBankAccount(bankAccountId: bankAccountId),
+    );
   }
 
   late final _$loadWalletDataAsyncAction = AsyncAction(
@@ -227,6 +303,86 @@ mixin _$WalletStore on _WalletStore, Store {
     );
   }
 
+  late final _$loadSupportedBanksAsyncAction = AsyncAction(
+    '_WalletStore.loadSupportedBanks',
+    context: context,
+  );
+
+  @override
+  Future<void> loadSupportedBanks({bool forceRefresh = false}) {
+    return _$loadSupportedBanksAsyncAction.run(
+      () => super.loadSupportedBanks(forceRefresh: forceRefresh),
+    );
+  }
+
+  late final _$verifyBankAccountAsyncAction = AsyncAction(
+    '_WalletStore.verifyBankAccount',
+    context: context,
+  );
+
+  @override
+  Future<bool> verifyBankAccount({
+    required String bankCode,
+    required String accountNumber,
+  }) {
+    return _$verifyBankAccountAsyncAction.run(
+      () => super.verifyBankAccount(
+        bankCode: bankCode,
+        accountNumber: accountNumber,
+      ),
+    );
+  }
+
+  late final _$linkBankAccountAsyncAction = AsyncAction(
+    '_WalletStore.linkBankAccount',
+    context: context,
+  );
+
+  @override
+  Future<bool> linkBankAccount({
+    required String bankCode,
+    required String accountNumber,
+  }) {
+    return _$linkBankAccountAsyncAction.run(
+      () => super.linkBankAccount(
+        bankCode: bankCode,
+        accountNumber: accountNumber,
+      ),
+    );
+  }
+
+  late final _$loadBankAccountsAsyncAction = AsyncAction(
+    '_WalletStore.loadBankAccounts',
+    context: context,
+  );
+
+  @override
+  Future<void> loadBankAccounts() {
+    return _$loadBankAccountsAsyncAction.run(() => super.loadBankAccounts());
+  }
+
+  late final _$setDefaultBankAccountAsyncAction = AsyncAction(
+    '_WalletStore.setDefaultBankAccount',
+    context: context,
+  );
+
+  @override
+  Future<bool> setDefaultBankAccount({required String bankAccountId}) {
+    return _$setDefaultBankAccountAsyncAction.run(
+      () => super.setDefaultBankAccount(bankAccountId: bankAccountId),
+    );
+  }
+
+  late final _$loadBankDataAsyncAction = AsyncAction(
+    '_WalletStore.loadBankData',
+    context: context,
+  );
+
+  @override
+  Future<void> loadBankData() {
+    return _$loadBankDataAsyncAction.run(() => super.loadBankData());
+  }
+
   late final _$_WalletStoreActionController = ActionController(
     name: '_WalletStore',
     context: context,
@@ -245,12 +401,27 @@ mixin _$WalletStore on _WalletStore, Store {
   }
 
   @override
+  void clearBankVerification() {
+    final _$actionInfo = _$_WalletStoreActionController.startAction(
+      name: '_WalletStore.clearBankVerification',
+    );
+    try {
+      return super.clearBankVerification();
+    } finally {
+      _$_WalletStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 walletData: ${walletData},
 transactions: ${transactions},
 commissionBreakdown: ${commissionBreakdown},
 withdrawals: ${withdrawals},
+supportedBanks: ${supportedBanks},
+bankAccounts: ${bankAccounts},
+bankVerification: ${bankVerification},
 isLoading: ${isLoading},
 errorMessage: ${errorMessage},
 successMessage: ${successMessage}

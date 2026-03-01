@@ -3,6 +3,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:go_router/go_router.dart';
 import 'package:recliq_agent/core/di/injection.dart';
 import 'package:recliq_agent/core/utils/currency_formatter.dart';
+import 'package:recliq_agent/core/utils/fcm_permission_helper.dart';
 import 'package:recliq_agent/features/auth/presentation/mobx/auth_store.dart';
 import 'package:recliq_agent/features/dashboard/presentation/mobx/dashboard_store.dart';
 import 'package:recliq_agent/shared/themes/app_theme.dart';
@@ -27,6 +28,15 @@ class _DashboardPageState extends State<DashboardPage> {
     super.initState();
     _dashboardStore.refresh();
     _authStore.getProfile();
+    _requestNotificationPermission();
+  }
+
+  Future<void> _requestNotificationPermission() async {
+    // Wait 2 seconds before showing permission request
+    await Future.delayed(const Duration(seconds: 2));
+    if (mounted) {
+      await FcmPermissionHelper.requestNotificationPermission(context);
+    }
   }
 
   @override
@@ -41,29 +51,40 @@ class _DashboardPageState extends State<DashboardPage> {
                 return const _DashboardShimmer();
               }
 
-              return RefreshIndicator(
-                onRefresh: _dashboardStore.refresh,
-                color: AppTheme.primaryGreen,
-                backgroundColor: AppTheme.cardBackground,
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.all(AppTheme.spacing16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildHeader(),
-                      const SizedBox(height: AppTheme.spacing20),
-                      _buildBalanceCard(),
-                      const SizedBox(height: AppTheme.spacing20),
-                      _buildOperationalSnapshot(),
-                      const SizedBox(height: AppTheme.spacing20),
-                      _buildQuickActions(),
-                      const SizedBox(height: AppTheme.spacing20),
-                      _buildPerformanceSection(),
-                      const SizedBox(height: AppTheme.spacing24),
-                    ],
+              return Column(
+                children: [
+                  // Fixed Header
+                  Container(
+                    padding: const EdgeInsets.all(AppTheme.spacing16),
+                    child: _buildHeader(),
                   ),
-                ),
+                  // Scrollable Content
+                  Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: _dashboardStore.refresh,
+                      color: AppTheme.primaryGreen,
+                      backgroundColor: AppTheme.cardBackground,
+                      child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacing16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: AppTheme.spacing20),
+                            _buildBalanceCard(),
+                            const SizedBox(height: AppTheme.spacing20),
+                            _buildOperationalSnapshot(),
+                            const SizedBox(height: AppTheme.spacing20),
+                            _buildQuickActions(),
+                            const SizedBox(height: AppTheme.spacing20),
+                            _buildPerformanceSection(),
+                            const SizedBox(height: 110),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               );
             },
           ),
@@ -76,126 +97,169 @@ class _DashboardPageState extends State<DashboardPage> {
     return Observer(
       builder: (_) {
         final user = _authStore.currentUser;
-        return Row(
-          children: [
-            CircleAvatar(
-              radius: 22,
-              backgroundColor: AppTheme.primaryGreen.withValues(alpha: 0.2),
-              backgroundImage: user?.profilePhoto != null
-                  ? NetworkImage(user!.profilePhoto!)
-                  : null,
-              child: user?.profilePhoto == null
-                  ? Text(
-                      (user?.name ?? 'A')[0].toUpperCase(),
-                      style: const TextStyle(
-                        color: AppTheme.primaryGreen,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 18,
-                      ),
-                    )
-                  : null,
-            ),
-            const SizedBox(width: AppTheme.spacing12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Hello, ${user?.name ?? 'Agent'}',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: AppTheme.textPrimary,
-                    ),
+        return Container(
+          padding: const EdgeInsets.all(AppTheme.spacing16),
+          decoration: BoxDecoration(
+            color: AppTheme.cardBackground,
+            borderRadius: BorderRadius.circular(AppTheme.radius16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              // Profile Avatar with enhanced styling
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: AppTheme.primaryGreen.withValues(alpha: 0.3),
+                    width: 2,
                   ),
-                  const SizedBox(height: 2),
-                  Row(
-                    children: [
-                      Observer(
-                        builder: (_) => _dashboardStore.isOnline
-                            ? StatusBadge.online()
-                            : StatusBadge.offline(),
+                ),
+                child: CircleAvatar(
+                  radius: 24,
+                  backgroundColor: AppTheme.primaryGreen.withValues(alpha: 0.1),
+                  backgroundImage: user?.profilePhoto != null
+                      ? NetworkImage(user!.profilePhoto!)
+                      : const AssetImage('assets/images/avatar.png'),
+                ),
+              ),
+              const SizedBox(width: AppTheme.spacing16),
+              
+              // User Info Section
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Greeting with improved typography
+                    Text(
+                      'Hello, ${user?.name ?? 'Agent'}',
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.textPrimary,
+                        letterSpacing: -0.5,
                       ),
-                      const SizedBox(width: AppTheme.spacing8),
-                      if (_dashboardStore.dashboardData != null)
-                        Text(
-                          _dashboardStore.dashboardData!.rankTier,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: _getRankColor(
-                                _dashboardStore.dashboardData!.rankTier),
+                    ),
+                    const SizedBox(height: AppTheme.spacing8),
+                    
+                    // Status and Controls Row
+                    Row(
+                      children: [
+                        // Status Badge
+                        Observer(
+                          builder: (_) => _dashboardStore.isOnline
+                              ? StatusBadge.online()
+                              : StatusBadge.offline(),
+                        ),
+                        const SizedBox(width: AppTheme.spacing12),
+                        
+                        // Online Toggle Switch with better styling
+                        Observer(
+                          builder: (_) => Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: _dashboardStore.isOnline
+                                  ? AppTheme.primaryGreen.withValues(alpha: 0.1)
+                                  : AppTheme.textTertiary.withValues(alpha: 0.1),
+                            ),
+                            child: Switch(
+                              value: _dashboardStore.isOnline,
+                              onChanged: (_) => _dashboardStore.toggleOnline(),
+                              activeColor: AppTheme.primaryGreen,
+                              activeTrackColor: AppTheme.primaryGreen.withValues(alpha: 0.3),
+                              inactiveThumbColor: AppTheme.textTertiary,
+                              inactiveTrackColor: AppTheme.textTertiary.withValues(alpha: 0.2),
+                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
                           ),
                         ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            GestureDetector(
-              onTap: () => _dashboardStore.toggleOnline(),
-              child: Observer(
-                builder: (_) => Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppTheme.spacing12,
-                    vertical: AppTheme.spacing8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: _dashboardStore.isOnline
-                        ? AppTheme.successColor.withValues(alpha: 0.15)
-                        : AppTheme.textTertiary.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(AppTheme.radius20),
-                    border: Border.all(
-                      color: _dashboardStore.isOnline
-                          ? AppTheme.successColor.withValues(alpha: 0.3)
-                          : AppTheme.textTertiary.withValues(alpha: 0.3),
+                        
+                        // Rank Tier Badge
+                        if (_dashboardStore.dashboardData != null) ...[
+                          const SizedBox(width: AppTheme.spacing12),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppTheme.spacing8,
+                              vertical: AppTheme.spacing4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _getRankColor(_dashboardStore.dashboardData!.rankTier)
+                                  .withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(AppTheme.radius8),
+                              border: Border.all(
+                                color: _getRankColor(_dashboardStore.dashboardData!.rankTier)
+                                    .withValues(alpha: 0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: Text(
+                              _dashboardStore.dashboardData!.rankTier,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: _getRankColor(_dashboardStore.dashboardData!.rankTier),
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
+                  ],
+                ),
+              ),
+              
+              // Notification Button with enhanced styling
+              Container(
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryGreen.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppTheme.radius12),
+                  border: Border.all(
+                    color: AppTheme.primaryGreen.withValues(alpha: 0.2),
+                    width: 1,
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        _dashboardStore.isOnline
-                            ? Icons.power_settings_new
-                            : Icons.power_off,
-                        size: 16,
-                        color: _dashboardStore.isOnline
-                            ? AppTheme.successColor
-                            : AppTheme.textTertiary,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        _dashboardStore.isOnline ? 'Online' : 'Offline',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: _dashboardStore.isOnline
-                              ? AppTheme.successColor
-                              : AppTheme.textTertiary,
+                ),
+                child: Stack(
+                  children: [
+                    GestureDetector(
+                      onTap: () {},
+                      child: Container(
+                        padding: const EdgeInsets.all(AppTheme.spacing8),
+                        child: Icon(
+                          Icons.notifications_outlined,
+                          color: AppTheme.primaryGreen,
+                          size: 24,
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                    // Notification indicator dot
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: AppTheme.errorColor,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: AppTheme.cardBackground,
+                            width: 2,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-            const SizedBox(width: AppTheme.spacing8),
-            GestureDetector(
-              onTap: () {},
-              child: Container(
-                padding: const EdgeInsets.all(AppTheme.spacing8),
-                decoration: BoxDecoration(
-                  color: AppTheme.cardBackground,
-                  borderRadius: BorderRadius.circular(AppTheme.radius12),
-                ),
-                child: const Icon(
-                  Icons.notifications_outlined,
-                  color: AppTheme.textPrimary,
-                  size: 22,
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         );
       },
     );
@@ -390,54 +454,92 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Widget _buildQuickActions() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Quick Actions',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: AppTheme.textPrimary,
+    return GlassCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Quick Actions',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.textPrimary,
+            ),
           ),
-        ),
-        const SizedBox(height: AppTheme.spacing12),
-        Row(
-          children: [
-            Expanded(
-              child: _buildActionButton(
-                'Scan QR',
-                Icons.qr_code_scanner,
-                () {},
+          const SizedBox(height: AppTheme.spacing16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildActionButton(
+                  'Scan QR',
+                  Icons.qr_code_scanner,
+                  () {},
+                ),
               ),
-            ),
-            const SizedBox(width: AppTheme.spacing12),
-            Expanded(
-              child: _buildActionButton(
-                'New Pickup',
-                Icons.add_circle_outline,
-                () => context.go('/shell/jobs'),
+              const SizedBox(width: AppTheme.spacing12),
+              Expanded(
+                child: _buildActionButton(
+                  'Pickup',
+                  Icons.add_circle_outline,
+                  () => context.go('/shell/jobs'),
+                ),
               ),
-            ),
-            const SizedBox(width: AppTheme.spacing12),
-            Expanded(
-              child: _buildActionButton(
-                'Reports',
-                Icons.bar_chart,
-                () => context.go('/shell/insights'),
+              const SizedBox(width: AppTheme.spacing12),
+              Expanded(
+                child: _buildActionButton(
+                  'Reports',
+                  Icons.bar_chart,
+                  () => context.go('/shell/insights'),
+                ),
               ),
-            ),
-            const SizedBox(width: AppTheme.spacing12),
-            Expanded(
-              child: _buildActionButton(
-                'Support',
-                Icons.headset_mic_outlined,
-                () {},
+              const SizedBox(width: AppTheme.spacing12),
+              Expanded(
+                child: _buildActionButton(
+                  'Insight',
+                  Icons.trending_up,
+                  () => context.go('/shell/performance'),
+                ),
               ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+          const SizedBox(height: AppTheme.spacing12),
+          Row(
+            children: [
+              Expanded(
+                child: _buildActionButton(
+                  'Bonuses',
+                  Icons.card_giftcard,
+                  () => context.go('/shell/bonuses'),
+                ),
+              ),
+              const SizedBox(width: AppTheme.spacing12),
+              Expanded(
+                child: _buildActionButton(
+                  'Disputes',
+                  Icons.gavel,
+                  () => context.go('/shell/disputes'),
+                ),
+              ),
+              const SizedBox(width: AppTheme.spacing12),
+              Expanded(
+                child: _buildActionButton(
+                  'Wallet',
+                  Icons.account_balance_wallet,
+                  () => context.go('/shell/wallet'),
+                ),
+              ),
+              const SizedBox(width: AppTheme.spacing12),
+              Expanded(
+                child: _buildActionButton(
+                  'Support',
+                  Icons.headset_mic_outlined,
+                  () {},
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
