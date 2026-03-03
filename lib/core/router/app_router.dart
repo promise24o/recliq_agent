@@ -17,6 +17,8 @@ import 'package:recliq_agent/features/disputes/presentation/pages/disputes_page.
 import 'package:recliq_agent/features/insights/presentation/pages/insights_page.dart';
 import 'package:recliq_agent/features/jobs/presentation/pages/jobs_page.dart';
 import 'package:recliq_agent/features/performance/presentation/pages/performance_page.dart';
+import 'package:recliq_agent/features/pickup/presentation/pages/pending_pickups_page.dart';
+import 'package:recliq_agent/features/pickup/presentation/pages/pickup_detail_page.dart';
 import 'package:recliq_agent/features/profile/presentation/pages/profile_page.dart';
 import 'package:recliq_agent/features/vehicle_details/presentation/pages/vehicle_details_page.dart';
 import 'package:recliq_agent/features/wallet/presentation/pages/wallet_page.dart';
@@ -24,10 +26,10 @@ import 'package:recliq_agent/features/wallet/presentation/pages/bank_accounts_pa
 import 'package:recliq_agent/features/zones/presentation/pages/service_radius_page.dart';
 import 'package:recliq_agent/shared/widgets/app_shell.dart';
 
-final _rootNavigatorKey = GlobalKey<NavigatorState>();
+final rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final appRouter = GoRouter(
-  navigatorKey: _rootNavigatorKey,
+  navigatorKey: rootNavigatorKey,
   initialLocation: '/',
   routes: [
     GoRoute(
@@ -74,6 +76,18 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/dashboard',
       redirect: (context, state) => '/shell/dashboard',
+    ),
+    // Pickup routes
+    GoRoute(
+      path: '/pickups',
+      builder: (context, state) => const PendingPickupsPage(),
+    ),
+    GoRoute(
+      path: '/pickup/:id',
+      builder: (context, state) {
+        final pickupId = state.pathParameters['id']!;
+        return PickupDetailPage(pickupId: pickupId);
+      },
     ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {

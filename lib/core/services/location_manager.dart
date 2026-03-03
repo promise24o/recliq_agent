@@ -89,6 +89,40 @@ class LocationManager {
     return true;
   }
 
+  /// Get current position once (without starting continuous tracking)
+  Future<LocationData?> getCurrentPosition() async {
+    try {
+      final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      final locationData = LocationData(
+        latitude: position.latitude,
+        longitude: position.longitude,
+        accuracy: position.accuracy,
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+      );
+
+      // Validate accuracy
+      if (locationData.accuracy > AppConfig.locationAccuracyThreshold) {
+        print('[LocationManager] getCurrentPosition: accuracy ${locationData.accuracy.toStringAsFixed(1)}m > ${AppConfig.locationAccuracyThreshold}m');
+        // Still return it, let caller decide
+      }
+
+      // Validate coordinates
+      if (!_isValidCoordinate(locationData.latitude, locationData.longitude)) {
+        print('[LocationManager] getCurrentPosition: invalid coordinates');
+        return null;
+      }
+
+      _lastLocation = locationData;
+      return locationData;
+    } catch (e) {
+      print('[LocationManager] getCurrentPosition error: $e');
+      return null;
+    }
+  }
+
   /// Start GPS polling at the current frequency
   Future<void> startTracking() async {
     if (_isTracking) return;

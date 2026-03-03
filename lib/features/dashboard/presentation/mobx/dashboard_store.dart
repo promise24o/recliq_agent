@@ -80,7 +80,32 @@ abstract class _DashboardStore with Store {
     isOnline = newStatus;
     
     try {
-      final success = await _availabilityRepository.updateOnlineStatus(newStatus);
+      // Get current location when going online to store in Redis
+      double? lat;
+      double? lng;
+      double? accuracy;
+      
+      if (newStatus) {
+        // Request location permission and get current position
+        final hasPermission = await _locationService.requestPermissionOnly();
+        if (hasPermission) {
+          final location = await _locationService.getCurrentLocation();
+          if (location != null) {
+            lat = location.latitude;
+            lng = location.longitude;
+            accuracy = location.accuracy;
+            print('[DashboardStore] Got location: $lat, $lng (accuracy: $accuracy)');
+          }
+        }
+      }
+      
+      final success = await _availabilityRepository.updateOnlineStatus(
+        newStatus,
+        lat: lat,
+        lng: lng,
+        accuracy: accuracy,
+      );
+      
       if (!success) {
         errorMessage = 'Failed to update online status';
       } else {

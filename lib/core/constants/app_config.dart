@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppConfig {
   static const String appName = 'Recliq Agent';
-  static const String baseUrl = 'https://0bfd-105-127-15-165.ngrok-free.app';
+  static const String baseUrl = 'https://bce5-105-127-14-150.ngrok-free.app';
   // static const String baseUrl = 'http://10.0.2.2:5001';
 
 

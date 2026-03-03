@@ -1,8 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:injectable/injectable.dart';
 import 'package:recliq_agent/core/constants/app_config.dart';
 import 'package:recliq_agent/core/network/dio_client.dart';
 
+@lazySingleton
 class FcmRemoteDataSource {
   final DioClient _dioClient;
   final FlutterSecureStorage _secureStorage;

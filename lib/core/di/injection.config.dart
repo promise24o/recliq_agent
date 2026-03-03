@@ -66,6 +66,15 @@ import '../../features/performance/domain/repositories/performance_repository.da
     as _i323;
 import '../../features/performance/presentation/mobx/performance_store.dart'
     as _i249;
+import '../../features/pickup/data/datasources/pickup_remote_datasource.dart'
+    as _i8;
+import '../../features/pickup/data/repositories/pickup_repository_impl.dart'
+    as _i825;
+import '../../features/pickup/data/services/pickup_websocket_service.dart'
+    as _i827;
+import '../../features/pickup/domain/repositories/pickup_repository.dart'
+    as _i113;
+import '../../features/pickup/presentation/mobx/pickup_store.dart' as _i461;
 import '../../features/vehicle_details/data/repositories/vehicle_details_repository_impl.dart'
     as _i745;
 import '../../features/vehicle_details/di/vehicle_details_module.dart' as _i63;
@@ -90,6 +99,9 @@ import '../../features/zones/presentation/mobx/service_radius_store.dart'
     as _i539;
 import '../network/dio_client.dart' as _i667;
 import '../network/token_interceptor.dart' as _i34;
+import '../services/fcm_remote_data_source.dart' as _i480;
+import '../services/fcm_service.dart' as _i928;
+import '../services/sound_service.dart' as _i829;
 import 'register_module.dart' as _i291;
 
 extension GetItInjectableX on _i174.GetIt {
@@ -112,11 +124,15 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i892.FirebaseMessaging>(
       () => registerModule.firebaseMessaging,
     );
+    gh.lazySingleton<_i829.SoundService>(() => _i829.SoundService());
     gh.factory<_i747.ActivityRemoteDataSource>(
       () => activityModule.activityRemoteDataSource,
     );
     gh.lazySingleton<_i34.TokenInterceptor>(
       () => _i34.TokenInterceptor(gh<_i558.FlutterSecureStorage>()),
+    );
+    gh.lazySingleton<_i827.PickupWebSocketService>(
+      () => _i827.PickupWebSocketService(gh<_i558.FlutterSecureStorage>()),
     );
     gh.factory<_i375.GetOnboardingStatus>(
       () => _i375.GetOnboardingStatus(gh<_i558.FlutterSecureStorage>()),
@@ -135,6 +151,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i540.PerformanceRemoteDataSource>(
       () => _i540.PerformanceRemoteDataSourceImpl(gh<_i667.DioClient>()),
+    );
+    gh.lazySingleton<_i8.PickupRemoteDataSource>(
+      () => _i8.PickupRemoteDataSourceImpl(gh<_i667.DioClient>()),
     );
     gh.lazySingleton<_i817.DashboardRemoteDataSource>(
       () => _i817.DashboardRemoteDataSourceImpl(gh<_i667.DioClient>()),
@@ -179,9 +198,25 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i558.FlutterSecureStorage>(),
       ),
     );
+    gh.lazySingleton<_i480.FcmRemoteDataSource>(
+      () => _i480.FcmRemoteDataSource(
+        gh<_i667.DioClient>(),
+        gh<_i558.FlutterSecureStorage>(),
+      ),
+    );
+    gh.lazySingleton<_i113.PickupRepository>(
+      () => _i825.PickupRepositoryImpl(gh<_i8.PickupRemoteDataSource>()),
+    );
     gh.lazySingleton<_i323.PerformanceRepository>(
       () => _i239.PerformanceRepositoryImpl(
         gh<_i540.PerformanceRemoteDataSource>(),
+      ),
+    );
+    gh.lazySingleton<_i928.FcmService>(
+      () => _i928.FcmService(
+        gh<_i892.FirebaseMessaging>(),
+        gh<_i480.FcmRemoteDataSource>(),
+        gh<_i460.SharedPreferences>(),
       ),
     );
     gh.factory<_i664.WalletStore>(
@@ -194,6 +229,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i973.JobsRepository>(
       () => _i150.JobsRepositoryImpl(gh<_i937.JobsRemoteDataSource>()),
+    );
+    gh.factory<_i461.PickupStore>(
+      () => _i461.PickupStore(gh<_i113.PickupRepository>()),
     );
     gh.factory<_i249.PerformanceStore>(
       () => _i249.PerformanceStore(gh<_i323.PerformanceRepository>()),

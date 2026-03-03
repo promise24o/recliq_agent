@@ -39,6 +39,13 @@ class _AvailabilitySchedulePageState extends State<AvailabilitySchedulePage> {
         SnackBar(
           content: Text(_store.errorMessage!),
           backgroundColor: AppTheme.errorColor,
+          action: SnackBarAction(
+            label: 'Dismiss',
+            textColor: Colors.white,
+            onPressed: () {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            },
+          ),
         ),
       );
     }
@@ -57,21 +64,28 @@ class _AvailabilitySchedulePageState extends State<AvailabilitySchedulePage> {
           if (_store.errorMessage != null) {
             return Center(
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(24),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.error_outline,
-                      size: 48,
-                      color: AppTheme.errorColor,
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppTheme.errorColor.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.cloud_off_rounded,
+                        size: 48,
+                        color: AppTheme.errorColor,
+                      ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 20),
                     Text(
-                      'Error loading availability',
+                      'Oops! Something went wrong',
                       style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
                         color: AppTheme.textPrimary,
                       ),
                     ),
@@ -85,9 +99,27 @@ class _AvailabilitySchedulePageState extends State<AvailabilitySchedulePage> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 24),
-                    ElevatedButton(
-                      onPressed: () => _store.loadAvailability(),
-                      child: const Text('Retry'),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        OutlinedButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: AppTheme.borderSoft),
+                            foregroundColor: AppTheme.textSecondary,
+                          ),
+                          child: const Text('Go Back'),
+                        ),
+                        const SizedBox(width: 12),
+                        ElevatedButton(
+                          onPressed: () => _store.loadAvailability(),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.primaryGreen,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: const Text('Try Again'),
+                        ),
+                      ],
                     ),
                   ],
                 ),

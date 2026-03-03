@@ -42,11 +42,27 @@ class AvailabilityRepositoryImpl implements AvailabilityRepository {
   }
 
   @override
-  Future<bool> updateOnlineStatus(bool isOnline) async {
+  Future<bool> updateOnlineStatus(
+    bool isOnline, {
+    double? lat,
+    double? lng,
+    double? accuracy,
+  }) async {
     try {
+      final payload = <String, dynamic>{'isOnline': isOnline};
+      
+      // Include location when going online (for Redis geo storage)
+      if (isOnline && lat != null && lng != null) {
+        payload['lat'] = lat;
+        payload['lng'] = lng;
+        if (accuracy != null) {
+          payload['accuracy'] = accuracy;
+        }
+      }
+      
       final response = await _dioClient.patch(
         '/agent-availability/online-status',
-        data: {'isOnline': isOnline},
+        data: payload,
       );
 
       final data = response.data as Map<String, dynamic>;

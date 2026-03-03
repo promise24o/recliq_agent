@@ -57,6 +57,9 @@ dependencies:
   geolocator: ^11.0.0
   geocoding: ^2.1.1
   
+  # Audio
+  audioplayers: ^5.2.1
+  
   # Google Maps
   google_maps_flutter: ^2.14.2
 
@@ -65,6 +68,9 @@ dependencies:
 
   # Navigation
   go_router: ^14.2.0
+
+  # URL Launcher
+  url_launcher: ^6.2.5
 
   # Intl
   intl: ^0.19.0
@@ -93,3 +99,4 @@ flutter:
   assets:
     - assets/images/
     - assets/lottie/
+    - assets/sounds/

@@ -35,6 +35,16 @@ class AgentLocationService {
   bool get isWsConnected => _webSocketManager.isConnected;
   LocationData? get lastLocation => _locationManager.lastLocation;
 
+  /// Request location permission only (without starting tracking)
+  Future<bool> requestPermissionOnly() async {
+    return await _locationManager.requestPermission();
+  }
+
+  /// Get current location without starting continuous tracking
+  Future<LocationData?> getCurrentLocation() async {
+    return await _locationManager.getCurrentPosition();
+  }
+
   /// Called when agent goes ONLINE.
   /// 1. Request location permission
   /// 2. Connect WebSocket

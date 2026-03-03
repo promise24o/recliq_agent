@@ -15,6 +15,27 @@ abstract class _AvailabilityStore with Store {
 
   _AvailabilityStore(this._repository);
 
+  /// Convert technical errors to user-friendly messages
+  String _getHumanizedErrorMessage(String technicalError) {
+    if (technicalError.contains('500') || technicalError.contains('Internal Server Error')) {
+      return 'Our servers are having a bit of trouble right now. Please try again in a moment.';
+    } else if (technicalError.contains('401') || technicalError.contains('Unauthorized')) {
+      return 'Your session has expired. Please log in again to continue.';
+    } else if (technicalError.contains('403') || technicalError.contains('Forbidden')) {
+      return 'You don\'t have permission to access this feature.';
+    } else if (technicalError.contains('404') || technicalError.contains('Not Found')) {
+      return 'We couldn\'t find what you\'re looking for. It may not exist or may have been moved.';
+    } else if (technicalError.contains('timeout') || technicalError.contains('TimeoutException')) {
+      return 'The connection is taking too long. Please check your internet connection and try again.';
+    } else if (technicalError.contains('network') || technicalError.contains('SocketException')) {
+      return 'Unable to connect to our servers. Please check your internet connection.';
+    } else if (technicalError.contains('DioException')) {
+      return 'Having trouble connecting to our servers. Please try again.';
+    } else {
+      return 'Something unexpected happened. Our team has been notified and is working on it.';
+    }
+  }
+
   AgentLocationService get _locationService => GetIt.instance<AgentLocationService>();
 
   @observable
@@ -50,7 +71,7 @@ abstract class _AvailabilityStore with Store {
         availability = newAvailability;
       }
     } catch (e) {
-      errorMessage = e.toString();
+      errorMessage = _getHumanizedErrorMessage(e.toString());
     } finally {
       isLoading = false;
     }
@@ -69,7 +90,7 @@ abstract class _AvailabilityStore with Store {
       successMessage = 'Schedule updated successfully';
       return true;
     } catch (e) {
-      errorMessage = e.toString();
+      errorMessage = _getHumanizedErrorMessage(e.toString());
       return false;
     } finally {
       isSaving = false;
@@ -89,7 +110,32 @@ abstract class _AvailabilityStore with Store {
     availability = availability!.copyWith(isOnline: newStatus);
     
     try {
-      final success = await _repository.updateOnlineStatus(newStatus);
+      // Get current location when going online to store in Redis
+      double? lat;
+      double? lng;
+      double? accuracy;
+      
+      if (newStatus) {
+        // Request location permission and get current position
+        final hasPermission = await _locationService.requestPermissionOnly();
+        if (hasPermission) {
+          final location = await _locationService.getCurrentLocation();
+          if (location != null) {
+            lat = location.latitude;
+            lng = location.longitude;
+            accuracy = location.accuracy;
+            print('[AvailabilityStore] Got location: $lat, $lng (accuracy: $accuracy)');
+          }
+        }
+      }
+      
+      final success = await _repository.updateOnlineStatus(
+        newStatus,
+        lat: lat,
+        lng: lng,
+        accuracy: accuracy,
+      );
+      
       if (success) {
         // Start/stop location tracking based on online status
         if (newStatus) {
@@ -101,7 +147,7 @@ abstract class _AvailabilityStore with Store {
       return success;
     } catch (e) {
       // Only show error but don't revert - user's intent should be preserved
-      errorMessage = 'Sync issue: ${e.toString()}';
+      errorMessage = 'Having trouble updating your status. Please check your connection and try again.';
       return false;
     } finally {
       // Clear flag after operation completes

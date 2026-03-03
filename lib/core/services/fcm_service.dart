@@ -3,8 +3,37 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:injectable/injectable.dart';
+import 'package:recliq_agent/core/di/injection.dart';
+import 'package:recliq_agent/core/services/sound_service.dart';
+import 'package:recliq_agent/features/pickup/domain/entities/pickup_request.dart';
+import 'package:recliq_agent/features/pickup/presentation/widgets/pickup_request_bottom_sheet.dart';
 import 'fcm_remote_data_source.dart';
 import '../widgets/fcm_permission_bottom_sheet.dart';
+import '../router/app_router.dart';
+
+/// Parse waste type from string to enum
+WasteType _parseWasteType(String? wasteType) {
+  switch (wasteType?.toLowerCase()) {
+    case 'plastic':
+      return WasteType.plastic;
+    case 'paper':
+      return WasteType.paper;
+    case 'metal':
+      return WasteType.metal;
+    case 'glass':
+      return WasteType.glass;
+    case 'organic':
+      return WasteType.organic;
+    case 'e_waste':
+    case 'e-waste':
+      return WasteType.eWaste;
+    case 'mixed':
+      return WasteType.mixed;
+    default:
+      return WasteType.mixed;
+  }
+}
 
 /// Background message handler - must be top-level function
 @pragma('vm:entry-point')
@@ -12,13 +41,43 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print('[FCM] Background message: ${message.messageId}');
   print('[FCM] Title: ${message.notification?.title}');
   print('[FCM] Body: ${message.notification?.body}');
+  print('[FCM] Data: ${message.data}');
+  
+  // Play sound for pickup notifications in background
+  final notificationType = message.data['type'] ?? '';
+  if (notificationType == 'new_pickup_request' || 
+      notificationType == 'agent_assigned') {
+    // Initialize GetIt for background
+    await configureDependencies();
+    
+    try {
+      final soundService = getIt<SoundService>();
+      await soundService.playAlertSound(repeatCount: 6);
+      print('[FCM] Background sound played for pickup notification');
+    } catch (e) {
+      print('[FCM] Error playing background sound: $e');
+    }
+  }
 }
 
+@lazySingleton
 class FcmService {
   final FirebaseMessaging _firebaseMessaging;
   final FcmRemoteDataSource _remoteDataSource;
   final SharedPreferences _prefs;
   final FlutterLocalNotificationsPlugin _localNotifications;
+  
+  // Navigation callbacks - settable after construction
+  void Function(String)? onNavigateToPickup;
+  void Function()? onNavigateToPendingPickups;
+  void Function()? onNavigateToWallet;
+  void Function()? onNavigateToEarnings;
+  void Function()? onNavigateToProfile;
+  void Function()? onNavigateToDashboard;
+  void Function()? onNavigateToKyc;
+  
+  // Queue for pending notifications when context isn't available
+  static final List<RemoteMessage> _pendingNotifications = [];
 
   FcmService(
     this._firebaseMessaging,
@@ -32,6 +91,9 @@ class FcmService {
 
     // Initialize local notifications
     await _initializeLocalNotifications();
+    
+    // Listen for app lifecycle changes
+    WidgetsBinding.instance.addObserver(_AppLifecycleObserver(this));
 
     // Set up background message handler
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
@@ -43,8 +105,81 @@ class FcmService {
       print('[FCM] Body: ${message.notification?.body}');
       print('[FCM] Data: ${message.data}');
       
-      // Show local notification for foreground messages
-      _showLocalNotification(message);
+      // Play alert sound for pickup notifications
+      final notificationType = message.data['type'] ?? '';
+      print('[FCM] Notification type: $notificationType');
+      if (notificationType == 'new_pickup_request' || 
+          notificationType == 'agent_assigned') {
+        print('[FCM] Processing pickup notification...');
+        try {
+          print('[FCM] Getting sound service...');
+          final soundService = getIt<SoundService>();
+          print('[FCM] Playing sound...');
+          soundService.playAlertSound(repeatCount: 6);
+          print('[FCM] Sound service called');
+          
+          // Show pickup request bottom sheet
+          final context = rootNavigatorKey.currentContext;
+          print('[FCM] Current context available: ${context != null}');
+          print('[FCM] Navigator key state: ${rootNavigatorKey.currentState}');
+          if (context != null) {
+            print('[FCM] Creating pickup request...');
+            final pickupRequest = PickupRequest(
+              id: message.data['pickupId'] ?? '',
+              userId: '', // Not provided in FCM data
+              userName: message.data['userName'],
+              userPhone: null, // Not provided in FCM data
+              address: message.data['address'],
+              pickupMode: PickupMode.pickup,
+              wasteType: _parseWasteType(message.data['wasteType']),
+              estimatedWeight: double.tryParse(message.data['estimatedWeight']?.toString() ?? '0') ?? 0,
+              status: PickupStatus.newRequest,
+              coordinates: null, // Not provided in FCM data
+              pricing: message.data['totalAmount'] != null
+                ? PickupPricing(
+                    totalAmount: double.tryParse(message.data['totalAmount']?.toString() ?? '0') ?? 0,
+                  )
+                : null,
+              createdAt: DateTime.now().toIso8601String(),
+              updatedAt: DateTime.now().toIso8601String(),
+            );
+            print('[FCM] Pickup request created: ${pickupRequest.userName}, ${pickupRequest.address}');
+            
+            // Add delay to ensure context is ready and app is fully resumed
+            Future.delayed(const Duration(milliseconds: 500), () {
+              if (context.mounted && rootNavigatorKey.currentState != null) {
+                showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (context) => PickupRequestBottomSheet(
+                request: pickupRequest,
+                onAccept: () {
+                  Navigator.of(context).pop();
+                  onNavigateToPickup?.call(pickupRequest.id);
+                },
+                onDecline: () {
+                  Navigator.of(context).pop();
+                },
+                onClose: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+                );
+                print('[FCM] Bottom sheet shown successfully');
+              } else {
+                print('[FCM] Context not mounted - cannot show bottom sheet');
+              }
+            });
+          } else {
+            print('[FCM] No context available - queuing notification');
+            _pendingNotifications.add(message);
+            showPendingNotificationWhenReady();
+          }
+        } catch (e) {
+          print('[FCM] Error handling pickup notification: $e');
+        }
+      }
     });
 
     // Handle notification taps when app is in background
@@ -90,10 +225,12 @@ class FcmService {
 
     // Create Android notification channel
     const AndroidNotificationChannel channel = AndroidNotificationChannel(
-      'default',
-      'Default Notifications',
-      description: 'Default notification channel for R-Agent',
+      'pickup_requests',
+      'Pickup Requests',
+      description: 'Notifications for new pickup requests',
       importance: Importance.high,
+      playSound: true,
+      enableVibration: true,
     );
 
     await _localNotifications
@@ -102,43 +239,65 @@ class FcmService {
         ?.createNotificationChannel(channel);
   }
 
-  /// Show local notification for foreground messages
-  Future<void> _showLocalNotification(RemoteMessage message) async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-      'default',
-      'Default Notifications',
-      channelDescription: 'Default notification channel for R-Agent',
-      importance: Importance.max,
-      priority: Priority.high,
-      icon: '@mipmap/ic_launcher',
-      color: Color(0xFF1F6B43),
-      ledColor: Color(0xFF1F6B43),
-      ledOnMs: 1000,
-      ledOffMs: 500,
+  
+  /// Show pending notifications when context becomes available
+  void showPendingNotificationWhenReady() {
+    // Check periodically if context is available
+    Future.delayed(const Duration(seconds: 1), () {
+      final context = rootNavigatorKey.currentContext;
+      if (context != null && _pendingNotifications.isNotEmpty) {
+        print('[FCM] Context available, showing ${_pendingNotifications.length} pending notifications');
+        final message = _pendingNotifications.removeAt(0);
+        _showPickupBottomSheet(message, context);
+      } else if (_pendingNotifications.isNotEmpty) {
+        // Try again
+        showPendingNotificationWhenReady();
+      }
+    });
+  }
+  
+  /// Show pickup bottom sheet
+  void _showPickupBottomSheet(RemoteMessage message, BuildContext context) {
+    final pickupRequest = PickupRequest(
+      id: message.data['pickupId'] ?? '',
+      userId: '', // Not provided in FCM data
+      userName: message.data['userName'],
+      userPhone: null, // Not provided in FCM data
+      address: message.data['address'],
+      pickupMode: PickupMode.pickup,
+      wasteType: _parseWasteType(message.data['wasteType']),
+      estimatedWeight: double.tryParse(message.data['estimatedWeight']?.toString() ?? '0') ?? 0,
+      status: PickupStatus.newRequest,
+      coordinates: null, // Not provided in FCM data
+      pricing: message.data['totalAmount'] != null
+        ? PickupPricing(
+            totalAmount: double.tryParse(message.data['totalAmount']?.toString() ?? '0') ?? 0,
+          )
+        : null,
+      createdAt: DateTime.now().toIso8601String(),
+      updatedAt: DateTime.now().toIso8601String(),
     );
-
-    const DarwinNotificationDetails iOSPlatformChannelSpecifics =
-        DarwinNotificationDetails(
-      presentAlert: true,
-      presentBadge: true,
-      presentSound: true,
-    );
-
-    const NotificationDetails platformChannelSpecifics = NotificationDetails(
-      android: androidPlatformChannelSpecifics,
-      iOS: iOSPlatformChannelSpecifics,
-    );
-
-    await _localNotifications.show(
-      message.hashCode,
-      message.notification?.title ?? 'R-Agent',
-      message.notification?.body ?? 'You have a new notification',
-      platformChannelSpecifics,
-      payload: message.data.toString(),
+    
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => PickupRequestBottomSheet(
+        request: pickupRequest,
+        onAccept: () {
+          Navigator.of(context).pop();
+          onNavigateToPickup?.call(pickupRequest.id);
+        },
+        onDecline: () {
+          Navigator.of(context).pop();
+        },
+        onClose: () {
+          Navigator.of(context).pop();
+        },
+      ),
     );
   }
-
+  
   /// Handle notification tap from local notifications
   void _onNotificationTapped(NotificationResponse notificationResponse) {
     print('[FCM] Local notification tapped: ${notificationResponse.payload}');
@@ -275,25 +434,29 @@ class FcmService {
     // Handle different notification types for agent app
     if (data.containsKey('type')) {
       switch (data['type']) {
-        case 'pickup_request':
-          print('[FCM] Navigate to pickup request: ${data['pickupId']}');
-          // TODO: Navigate to pickup request details
+        case 'new_pickup_request':
+          print('[FCM] Navigate to new pickup request: ${data['pickupId']}');
+          _navigateToPickup(data['pickupId']);
           break;
-        case 'pickup_assigned':
+        case 'agent_assigned':
           print('[FCM] Navigate to assigned pickup: ${data['pickupId']}');
-          // TODO: Navigate to assigned pickup
+          _navigateToPickup(data['pickupId']);
+          break;
+        case 'pickup_cancelled':
+          print('[FCM] Pickup cancelled: ${data['pickupId']}');
+          _navigateToPendingPickups();
           break;
         case 'payment_received':
           print('[FCM] Navigate to wallet');
-          // TODO: Navigate to wallet page
+          _navigateToWallet();
           break;
         case 'kyc_approved':
           print('[FCM] KYC approved notification');
-          // TODO: Navigate to dashboard or show success
+          _navigateToDashboard();
           break;
         case 'kyc_rejected':
           print('[FCM] KYC rejected notification');
-          // TODO: Navigate to KYC page
+          _navigateToKyc();
           break;
         default:
           print('[FCM] Unknown notification type: ${data['type']}');
@@ -301,6 +464,36 @@ class FcmService {
     }
   }
 
+  void _navigateToPickup(String? pickupId) {
+    if (pickupId != null && onNavigateToPickup != null) {
+      onNavigateToPickup!(pickupId);
+    }
+  }
+
+  void _navigateToPendingPickups() {
+    onNavigateToPendingPickups?.call();
+  }
+
+  void _navigateToWallet() {
+    onNavigateToWallet?.call();
+  }
+
+  void _navigateToDashboard() {
+    onNavigateToDashboard?.call();
+  }
+
+  void _navigateToKyc() {
+    onNavigateToKyc?.call();
+  }
+
+  /// Check and show any pending notifications (can be called manually)
+  void checkPendingNotifications() {
+    if (_pendingNotifications.isNotEmpty) {
+      print('[FCM] Manually checking for ${_pendingNotifications.length} pending notifications');
+      showPendingNotificationWhenReady();
+    }
+  }
+  
   /// Listen for token refresh
   void listenForTokenRefresh() {
     _firebaseMessaging.onTokenRefresh.listen((newToken) async {
@@ -315,5 +508,25 @@ class FcmService {
       
       await _prefs.setString('fcm_token', newToken);
     });
+  }
+}
+
+/// App lifecycle observer to handle notification display when app resumes
+class _AppLifecycleObserver extends WidgetsBindingObserver {
+  final FcmService _fcmService;
+  
+  _AppLifecycleObserver(this._fcmService);
+  
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    
+    if (state == AppLifecycleState.resumed) {
+      print('[FCM] App resumed, checking for pending notifications');
+      // Check for pending notifications when app is resumed
+      Future.delayed(const Duration(milliseconds: 500), () {
+        _fcmService.showPendingNotificationWhenReady();
+      });
+    }
   }
 }
